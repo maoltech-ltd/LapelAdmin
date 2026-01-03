@@ -1,68 +1,127 @@
-import axiosInstance from "../../axios/axiosInstance";
+// services/rider.service.ts
+import axiosInstance from '../../axios/axiosInstance';
+import { 
+  Rider, 
+  BecomeARiderDto, 
+  Vehicle,
+  RiderSearchParams,
+  VehicleSearchParams,
+  AvailabilityUpdate,
+  ApiResponse,
+  PaginatedResponse
+} from '../../types/rider.types';
 
-interface RiderData {
-  id?: string;
-  userId: string;
-  vehicleType?: string;
-  licenseNumber?: string;
-  vehiclePlateNumber?: string;
-  isAvailable?: boolean;
-  status?: string;
-  // Add other rider fields as needed
-}
-
-interface RegisterRiderData {
-  userId: string;
-  vehicleType: string;
-  licenseNumber: string;
-  vehiclePlateNumber: string;
-  device: string;
-}
-
-interface AvailabilityData {
-  isAvailable: boolean;
-  device: string;
-}
+const getHeaders = (userId?: string) => {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  
+  if (userId) {
+    headers['USER-ID'] = userId;
+  }
+  
+  return { headers };
+};
 
 export const riderService = {
-  // Rider registration
-  registerRider: (data: RegisterRiderData) =>
-    axiosInstance.post(`/api/v1/${data.device}/riders/register`, data),
+  // Register as a rider
+  registerRider: async (device: string, userId: string, data: BecomeARiderDto): Promise<ApiResponse<Rider>> => {
+    const response = await axiosInstance.post(
+      `/api/v1/${device}/riders/register`,
+      data,
+      getHeaders(userId)
+    );
+    return response.data;
+  },
 
-  // Rider CRUD operations
-  getRiders: (device: string, params?: any) =>
-    axiosInstance.get(`/api/v1/${device}/riders`, { params }),
+  // Get rider profile
+  getRiderProfile: async (device: string, userId: string): Promise<ApiResponse<Rider>> => {
+    const response = await axiosInstance.get(
+      `/api/v1/${device}/riders/profile`,
+      getHeaders(userId)
+    );
+    return response.data;
+  },
 
-  getRiderProfile: (device: string) =>
-    axiosInstance.get(`/api/v1/${device}/riders/profile`),
+  // Get rider's vehicle
+  getRiderVehicle: async (device: string, userId: string): Promise<ApiResponse<Vehicle>> => {
+    const response = await axiosInstance.get(
+      `/api/v1/${device}/riders/vehicle`,
+      getHeaders(userId)
+    );
+    return response.data;
+  },
 
-  getRiderVehicles: (device: string) =>
-    axiosInstance.get(`/api/v1/${device}/riders/vehicles`),
+  // Update rider availability
+  updateRiderAvailability: async (device: string, userId: string, available: boolean): Promise<ApiResponse<Rider>> => {
+    const response = await axiosInstance.patch(
+      `/api/v1/${device}/riders/availability`,
+      null,
+      {
+        params: { available },
+        headers: getHeaders(userId).headers
+      }
+    );
+    return response.data;
+  },
 
-  getRiderVehicle: (device: string, riderId?: string) =>
-    axiosInstance.get(`/api/v1/${device}/riders/vehicle`, {
-      params: { riderId },
-    }),
+  // Get all riders with pagination
+  getAllRiders: async (device: string, params: RiderSearchParams): Promise<ApiResponse<PaginatedResponse<Rider>>> => {
+    const response = await axiosInstance.get(`/api/v1/${device}/riders`, {
+      params,
+      ...getHeaders()
+    });
+    return response.data;
+  },
 
-  // Rider status management
-  activateRider: (device: string, riderId: string) =>
-    axiosInstance.patch(`/api/v1/${device}/riders/${riderId}/activate`, {}),
+  // Get all vehicles with pagination
+  getAllVehicles: async (device: string, params: VehicleSearchParams): Promise<ApiResponse<PaginatedResponse<Vehicle>>> => {
+    const response = await axiosInstance.get(`/api/v1/${device}/riders/vehicles`, {
+      params,
+      ...getHeaders()
+    });
+    return response.data;
+  },
 
-  deactivateRider: (device: string, riderId: string) =>
-    axiosInstance.patch(`/api/v1/${device}/riders/${riderId}/deactivate`, {}),
+  // Activate rider
+  activateRider: async (device: string, riderId: string): Promise<ApiResponse<Rider>> => {
+    const response = await axiosInstance.patch(
+      `/api/v1/${device}/riders/${riderId}/activate`
+    );
+    return response.data;
+  },
 
-  updateAvailability: (data: AvailabilityData) =>
-    axiosInstance.patch(`/api/v1/${data.device}/riders/availability`, {
-      isAvailable: data.isAvailable,
-    }),
+  // Deactivate rider
+  deactivateRider: async (device: string, userId: string): Promise<ApiResponse<Rider>> => {
+    const response = await axiosInstance.patch(
+      `/api/v1/${device}/riders/${userId}/deactivate`,
+      null,
+      getHeaders(userId)
+    );
+    return response.data;
+  },
 
-  deleteRider: (device: string, riderId: string) =>
-    axiosInstance.delete(`/api/v1/${device}/riders/${riderId}`),
+  // Delete rider
+  deleteRider: async (device: string, userId: string): Promise<ApiResponse<void>> => {
+    const response = await axiosInstance.delete(
+      `/api/v1/${device}/riders/${userId}`,
+      getHeaders(userId)
+    );
+    return response.data;
+  },
 
   // Statistics
-  getRiderStatsCount: (device: string) =>
-    axiosInstance.get(`/api/v1/${device}/riders/stats/count`),
+  getTotalRidersCount: async (device: string): Promise<ApiResponse<number>> => {
+    const response = await axiosInstance.get(
+      `/api/v1/${device}/riders/stats/count`
+    );
+    return response.data;
+  },
 
-  getAvailableRidersCount: (device: string) =>
-    axiosInstance.get(`/api/v1/${device}/riders/stats/available-count`),
+  getAvailableRidersCount: async (device: string): Promise<ApiResponse<number>> => {
+    const response = await axiosInstance.get(
+      `/api/v1/${device}/riders/stats/available-count`
+    );
+    return response.data;
+  }
 };

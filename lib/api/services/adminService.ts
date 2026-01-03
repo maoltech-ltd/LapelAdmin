@@ -1,81 +1,41 @@
-import axiosInstance from "../../axios/axiosInstance";
-
-interface AdminData {
-  id?: string;
-  name: string;
-  email: string;
-  role?: string;
-  status?: string;
-  // Add other admin fields as needed
-}
-
-interface LoginData {
-  email: string;
-  password: string;
-  device: string;
-}
-
-interface PasswordResetRequest {
-  email: string;
-  device: string;
-}
-
-interface PasswordReset {
-  token: string;
-  password: string;
-  device: string;
-}
-
-interface ChangePasswordData {
-  oldPassword: string;
-  newPassword: string;
-  device: string;
-}
+// services/admin.service.ts
+import axiosInstance from '../../axios/axiosInstance';
+import { 
+  User,
+  ApiResponse,
+  PaginatedResponse
+} from '../../types/user.types';
+import { UserSearchParams } from '../../types/admin.types';
 
 export const adminService = {
-  // Authentication
-  login: (data: LoginData) =>
-    axiosInstance.post(`/api/v1/${data.device}/admins/login`, {
-      email: data.email,
-      password: data.password,
-    }),
+  // Search admins
+  searchAdmins: async (device: string, params: UserSearchParams): Promise<ApiResponse<PaginatedResponse<User>>> => {
+    const response = await axiosInstance.get(`/api/v1/${device}/admins/search`, {
+      params
+    });
+    return response.data;
+  },
 
-  // Password management
-  requestPasswordReset: (data: PasswordResetRequest) =>
-    axiosInstance.post(`/api/v1/${data.device}/admins/password-reset/request`, {
-      email: data.email,
-    }),
+  // Get admin by ID
+  getAdminById: async (device: string, id: string): Promise<ApiResponse<User>> => {
+    const response = await axiosInstance.get(`/api/v1/${device}/admins/${id}`);
+    return response.data;
+  },
 
-  resetPassword: (data: PasswordReset) =>
-    axiosInstance.post(`/api/v1/${data.device}/admins/password-reset`, data),
+  // Update admin profile
+  updateAdmin: async (device: string, data: Partial<User>): Promise<ApiResponse<User>> => {
+    const response = await axiosInstance.put(
+      `/api/v1/${device}/admins/update`,
+      data
+    );
+    return response.data;
+  },
 
-  changePassword: (data: ChangePasswordData) =>
-    axiosInstance.post(`/api/v1/${data.device}/admins/change-password`, data),
-
-  // Admin CRUD operations
-  getAdmins: (device: string, params?: any) =>
-    axiosInstance.get(`/api/v1/${device}/admins`, { params }),
-
-  getAdminById: (device: string, id: string) =>
-    axiosInstance.get(`/api/v1/${device}/admins/${id}`),
-
-  searchAdmins: (device: string, query: string, params?: any) =>
-    axiosInstance.get(`/api/v1/${device}/admins/search`, {
-      params: { query, ...params },
-    }),
-
-  updateAdmin: (device: string, id: string, data: Partial<AdminData>) =>
-    axiosInstance.put(`/api/v1/${device}/admins/update`, {
-      ...data,
-      id,
-    }),
-
-  deleteAdmin: (device: string, id: string) =>
-    axiosInstance.delete(`/api/v1/${device}/admins`, {
-      data: { id },
-    }),
-
-  // Profile management
-  getCurrentAdmin: (device: string) =>
-    axiosInstance.get(`/api/v1/${device}/admins/me`),
+  // Delete admin
+  deleteAdmin: async (device: string, id: string): Promise<ApiResponse<void>> => {
+    const response = await axiosInstance.delete(`/api/v1/${device}/admins`, {
+      params: { id }
+    });
+    return response.data;
+  }
 };

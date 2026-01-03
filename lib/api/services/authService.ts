@@ -1,44 +1,56 @@
-import axiosInstance from "../../axios/axiosInstance";
-
-
-interface LoginData {
-  email: string;
-  password: string;
-  device: string;
-}
-
-interface ResetPasswordData {
-  email: string;
-  device: string;
-}
-
-interface ChangePasswordData {
-  oldPassword: string;
-  newPassword: string;
-  device: string;
-}
+// services/auth.service.ts
+import axiosInstance from '../../axios/axiosInstance';
+import { 
+  AuthResponseDto, 
+  LoginDto, 
+  ResetPasswordDto, 
+  AdminChangePasswordDto,
+  ApiResponse 
+} from '../../types/auth.types';
 
 export const authService = {
-  login: (data: LoginData) =>
-    axiosInstance.post(`/api/v1/${data.device}/admins/login`, {
-      email: data.email,
-      password: data.password,
-    }),
+  // Admin login
+  login: async (device: string, data: LoginDto): Promise<ApiResponse<AuthResponseDto>> => {
+    const response = await axiosInstance.post(
+      `/api/v1/${device}/admins/login`,
+      data
+    );
+    return response.data;
+  },
 
-  requestPasswordReset: (data: ResetPasswordData) =>
-    axiosInstance.post(`/api/v1/${data.device}/admins/password-reset/request`, {
-      email: data.email,
-    }),
+  // Get current admin profile
+  getCurrentAdmin: async (device: string): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get(`/api/v1/${device}/admins/me`);
+    return response.data;
+  },
 
-  resetPassword: (token: string, data: { password: string; device: string }) =>
-    axiosInstance.post(`/api/v1/${data.device}/admins/password-reset`, {
-      token,
-      password: data.password,
-    }),
+  // Request password reset
+  requestPasswordReset: async (device: string, identifier: string): Promise<ApiResponse<string>> => {
+    const response = await axiosInstance.post(
+      `/api/v1/${device}/admins/password-reset/request`,
+      null,
+      {
+        params: { identifier }
+      }
+    );
+    return response.data;
+  },
 
-  changePassword: (data: ChangePasswordData) =>
-    axiosInstance.post(`/api/v1/${data.device}/admins/change-password`, data),
+  // Reset password
+  resetPassword: async (device: string, data: ResetPasswordDto): Promise<ApiResponse<string>> => {
+    const response = await axiosInstance.post(
+      `/api/v1/${device}/admins/password-reset`,
+      data
+    );
+    return response.data;
+  },
 
-  getCurrentAdmin: (device: string) =>
-    axiosInstance.get(`/api/v1/${device}/admins/me`),
+  // Change password (authenticated)
+  changePassword: async (device: string, data: AdminChangePasswordDto): Promise<ApiResponse<string>> => {
+    const response = await axiosInstance.post(
+      `/api/v1/${device}/admins/change-password`,
+      data
+    );
+    return response.data;
+  }
 };

@@ -1,399 +1,308 @@
+// slices/order.slice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+
+import { 
+  OrderDto, 
+  OrderRequestDto, 
+  OrderStatus, 
+  PaymentStatus,
+  OrderSearchParams,
+  ApiResponse,
+  PaginatedResponse 
+} from '../../types/order.types';
 import { orderService } from '../../api/services';
-interface OrderItem {
-  id: string;
-  name: string;
-  quantity: number;
-  price: number;
-  total: number;
-}
-
-interface Order {
-  id: string;
-  orderNumber: string;
-  userId: string;
-  riderId?: string;
-  rideId?: string;
-  items: OrderItem[];
-  totalAmount: number;
-  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'in_delivery' | 'delivered' | 'cancelled';
-  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
-  deliveryAddress: string;
-  deliveryInstructions?: string;
-  scheduledDeliveryTime?: string;
-  actualDeliveryTime?: string;
-  createdAt: string;
-  updatedAt: string;
-  user?: {
-    name: string;
-    phone: string;
-    email: string;
-  };
-  rider?: {
-    name: string;
-    phone: string;
-  };
-}
-
-interface OrderStats {
-  total: number;
-  pending: number;
-  confirmed: number;
-  preparing: number;
-  ready: number;
-  in_delivery: number;
-  delivered: number;
-  cancelled: number;
-  paid: number;
-  unpaid: number;
-}
 
 interface OrderState {
-  orders: Order[];
-  currentOrder: Order | null;
-  passengerOrders: Order[];
-  driverOrders: Order[];
-  orderDetails: Order | null;
+  orders: PaginatedResponse<OrderDto> | null;
+  passengerOrders: OrderDto[] | null;
+  driverOrders: OrderDto[] | null;
+  currentOrder: OrderDto | null;
+  stats: {
+    totalOrders: number | null;
+    paidOrders: number | null;
+    ordersByStatus: Record<OrderStatus, number>;
+  };
   loading: boolean;
   error: string | null;
-  totalOrders: number;
-  totalPassengerOrders: number;
-  totalDriverOrders: number;
-  stats: OrderStats | null;
+  success: boolean;
 }
 
 const initialState: OrderState = {
-  orders: [],
+  orders: null,
+  passengerOrders: null,
+  driverOrders: null,
   currentOrder: null,
-  passengerOrders: [],
-  driverOrders: [],
-  orderDetails: null,
+  stats: {
+    totalOrders: null,
+    paidOrders: null,
+    ordersByStatus: {} as Record<OrderStatus, number>,
+  },
   loading: false,
   error: null,
-  totalOrders: 0,
-  totalPassengerOrders: 0,
-  totalDriverOrders: 0,
-  stats: null,
+  success: false,
 };
 
-// Async Thunks
-export const fetchOrders = createAsyncThunk(
-  'orders/fetchOrders',
-  async ({ device, params }: { device: string; params?: any }) => {
-    const response = await orderService.getOrders(device, params);
-    return response.data;
+// Async thunks
+export const createOrder = createAsyncThunk(
+  'order/createOrder',
+  async ({ device, userId, data }: { device: string; userId: string; data: OrderRequestDto }) => {
+    return await orderService.createOrder(device, userId, data);
   }
 );
 
-export const fetchOrderDetails = createAsyncThunk(
-  'orders/fetchOrderDetails',
+export const getOrderById = createAsyncThunk(
+  'order/getOrderById',
   async ({ device, orderId }: { device: string; orderId: string }) => {
-    const response = await orderService.getOrderDetails(device, orderId);
-    return response.data;
+    return await orderService.getOrderById(device, orderId);
   }
 );
 
-export const bookOrder = createAsyncThunk(
-  'orders/bookOrder',
-  async ({ device, data }: { device: string; data: any }) => {
-    const response = await orderService.bookOrder(device, data);
-    return response.data;
+export const getAllOrders = createAsyncThunk(
+  'order/getAllOrders',
+  async ({ device, params }: { device: string; params: OrderSearchParams }) => {
+    return await orderService.getAllOrders(device, params);
+  }
+);
+
+export const getPassengerOrders = createAsyncThunk(
+  'order/getPassengerOrders',
+  async ({ device, userId }: { device: string; userId: string }) => {
+    return await orderService.getPassengerOrders(device, userId);
+  }
+);
+
+export const getDriverOrders = createAsyncThunk(
+  'order/getDriverOrders',
+  async ({ device, userId }: { device: string; userId: string }) => {
+    return await orderService.getDriverOrders(device, userId);
   }
 );
 
 export const updateOrderStatus = createAsyncThunk(
-  'orders/updateStatus',
-  async ({ device, orderId, status }: { device: string; orderId: string; status: string }) => {
-    const response = await orderService.updateOrderStatus(device, orderId, status);
-    return response.data;
+  'order/updateOrderStatus',
+  async ({ device, orderId, status, userId }: { device: string; orderId: string; status: OrderStatus; userId?: string }) => {
+    return await orderService.updateOrderStatus(device, orderId, status, userId);
   }
 );
 
-export const updateOrderPayment = createAsyncThunk(
-  'orders/updatePayment',
-  async ({ device, orderId, paymentData }: { device: string; orderId: string; paymentData: any }) => {
-    const response = await orderService.updateOrderPayment(device, orderId, paymentData);
-    return response.data;
+export const updatePaymentStatus = createAsyncThunk(
+  'order/updatePaymentStatus',
+  async ({ device, orderId, payment }: { device: string; orderId: string; payment: PaymentStatus }) => {
+    return await orderService.updatePaymentStatus(device, orderId, payment);
   }
 );
 
-export const updateOrderStatusBulk = createAsyncThunk(
-  'orders/updateStatusBulk',
-  async ({ device, data }: { device: string; data: { orderIds: string[]; status: string } }) => {
-    const response = await orderService.updateOrderStatusBulk(device, data);
-    return response.data;
-  }
-);
-
-export const fetchOrderStats = createAsyncThunk(
-  'orders/fetchStats',
+export const getTotalOrders = createAsyncThunk(
+  'order/getTotalOrders',
   async (device: string) => {
-    const [totalResponse, statusResponse, paidResponse] = await Promise.all([
-      orderService.getOrderStatsTotal(device),
-      orderService.getOrderStatsStatus(device),
-      orderService.getOrderStatsPaid(device),
-    ]);
-    
-    return {
-      total: totalResponse.data,
-      status: statusResponse.data,
-      paid: paidResponse.data,
-    };
+    return await orderService.getTotalOrders(device);
   }
 );
 
-export const fetchPassengerOrders = createAsyncThunk(
-  'orders/fetchPassengerOrders',
-  async ({ device, params }: { device: string; params?: any }) => {
-    const response = await orderService.getPassengerOrders(device, params);
-    return response.data;
+export const getPaidOrders = createAsyncThunk(
+  'order/getPaidOrders',
+  async (device: string) => {
+    return await orderService.getPaidOrders(device);
   }
 );
 
-export const fetchDriverOrders = createAsyncThunk(
-  'orders/fetchDriverOrders',
-  async ({ device, params }: { device: string; params?: any }) => {
-    const response = await orderService.getDriverOrders(device, params);
-    return response.data;
+export const getOrdersByStatus = createAsyncThunk(
+  'order/getOrdersByStatus',
+  async ({ device, status }: { device: string; status: OrderStatus }) => {
+    return await orderService.getOrdersByStatus(device, status);
   }
 );
 
-// Slice
 const orderSlice = createSlice({
-  name: 'orders',
+  name: 'order',
   initialState,
   reducers: {
-    clearOrders: (state) => {
-      state.orders = [];
-      state.passengerOrders = [];
-      state.driverOrders = [];
-      state.totalOrders = 0;
-      state.totalPassengerOrders = 0;
-      state.totalDriverOrders = 0;
-    },
-    setCurrentOrder: (state, action: PayloadAction<Order>) => {
-      state.currentOrder = action.payload;
-    },
-    clearCurrentOrder: (state) => {
-      state.currentOrder = null;
-    },
-    clearOrderDetails: (state) => {
-      state.orderDetails = null;
-    },
     clearError: (state) => {
       state.error = null;
     },
-    addOrder: (state, action: PayloadAction<Order>) => {
-      state.orders.unshift(action.payload);
-      state.totalOrders += 1;
+    clearSuccess: (state) => {
+      state.success = false;
     },
-    removeOrder: (state, action: PayloadAction<string>) => {
-      state.orders = state.orders.filter(order => order.id !== action.payload);
-      state.totalOrders -= 1;
+    setCurrentOrder: (state, action: PayloadAction<OrderDto | null>) => {
+      state.currentOrder = action.payload;
     },
-    updateOrderLocal: (state, action: PayloadAction<{ id: string; updates: Partial<Order> }>) => {
-      const { id, updates } = action.payload;
-      
-      // Update in orders array
-      state.orders = state.orders.map(order =>
-        order.id === id ? { ...order, ...updates } : order
-      );
-      
-      // Update in passenger orders array
-      state.passengerOrders = state.passengerOrders.map(order =>
-        order.id === id ? { ...order, ...updates } : order
-      );
-      
-      // Update in driver orders array
-      state.driverOrders = state.driverOrders.map(order =>
-        order.id === id ? { ...order, ...updates } : order
-      );
-      
-      // Update current order if it's the same
-      if (state.currentOrder?.id === id) {
-        state.currentOrder = { ...state.currentOrder, ...updates };
+    updateOrderInList: (state, action: PayloadAction<OrderDto>) => {
+      if (state.orders && state.orders.content) {
+        const index = state.orders.content.findIndex(o => o.id === action.payload.id);
+        if (index !== -1) {
+          state.orders.content[index] = action.payload;
+        }
       }
       
-      // Update order details if it's the same
-      if (state.orderDetails?.id === id) {
-        state.orderDetails = { ...state.orderDetails, ...updates };
+      if (state.passengerOrders) {
+        const index = state.passengerOrders.findIndex(o => o.id === action.payload.id);
+        if (index !== -1) {
+          state.passengerOrders[index] = action.payload;
+        }
+      }
+      
+      if (state.driverOrders) {
+        const index = state.driverOrders.findIndex(o => o.id === action.payload.id);
+        if (index !== -1) {
+          state.driverOrders[index] = action.payload;
+        }
       }
     },
   },
   extraReducers: (builder) => {
     builder
-      // Fetch orders
-      .addCase(fetchOrders.pending, (state) => {
+      // Create Order
+      .addCase(createOrder.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchOrders.fulfilled, (state, action) => {
+      .addCase(createOrder.fulfilled, (state, action) => {
         state.loading = false;
-        state.orders = action.payload.orders || action.payload.data || action.payload;
-        state.totalOrders = action.payload.total || action.payload.count || state.orders.length;
+        state.currentOrder = action.payload.data;
+        state.success = true;
       })
-      .addCase(fetchOrders.rejected, (state, action) => {
+      .addCase(createOrder.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch orders';
+        state.error = action.error.message || 'Failed to create order';
       })
-      // Fetch order details
-      .addCase(fetchOrderDetails.pending, (state) => {
+      
+      // Get Order by ID
+      .addCase(getOrderById.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
-      .addCase(fetchOrderDetails.fulfilled, (state, action) => {
+      .addCase(getOrderById.fulfilled, (state, action) => {
         state.loading = false;
-        state.orderDetails = action.payload;
+        state.currentOrder = action.payload.data;
+        state.success = true;
       })
-      .addCase(fetchOrderDetails.rejected, (state, action) => {
+      .addCase(getOrderById.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch order details';
+        state.error = action.error.message || 'Failed to get order details';
       })
-      // Book order
-      .addCase(bookOrder.pending, (state) => {
+      
+      // Get All Orders
+      .addCase(getAllOrders.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
-      .addCase(bookOrder.fulfilled, (state, action) => {
+      .addCase(getAllOrders.fulfilled, (state, action) => {
         state.loading = false;
-        state.orders.unshift(action.payload);
-        state.totalOrders += 1;
+        state.orders = action.payload.data;
+        state.success = true;
       })
-      .addCase(bookOrder.rejected, (state, action) => {
+      .addCase(getAllOrders.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to book order';
+        state.error = action.error.message || 'Failed to get orders';
       })
-      // Update order status
+      
+      // Get Passenger Orders
+      .addCase(getPassengerOrders.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getPassengerOrders.fulfilled, (state, action) => {
+        state.loading = false;
+        state.passengerOrders = action.payload.data;
+        state.success = true;
+      })
+      .addCase(getPassengerOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to get passenger orders';
+      })
+      
+      // Get Driver Orders
+      .addCase(getDriverOrders.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getDriverOrders.fulfilled, (state, action) => {
+        state.loading = false;
+        state.driverOrders = action.payload.data;
+        state.success = true;
+      })
+      .addCase(getDriverOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to get driver orders';
+      })
+      
+      // Update Order Status
       .addCase(updateOrderStatus.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(updateOrderStatus.fulfilled, (state, action) => {
         state.loading = false;
-        const updatedOrder = action.payload;
-        
-        // Update in all arrays
-        state.orders = state.orders.map(order =>
-          order.id === updatedOrder.id ? updatedOrder : order
-        );
-        state.passengerOrders = state.passengerOrders.map(order =>
-          order.id === updatedOrder.id ? updatedOrder : order
-        );
-        state.driverOrders = state.driverOrders.map(order =>
-          order.id === updatedOrder.id ? updatedOrder : order
-        );
-        
-        // Update current order and order details
-        if (state.currentOrder?.id === updatedOrder.id) {
-          state.currentOrder = updatedOrder;
-        }
-        if (state.orderDetails?.id === updatedOrder.id) {
-          state.orderDetails = updatedOrder;
-        }
+        state.currentOrder = action.payload.data;
+        state.success = true;
       })
       .addCase(updateOrderStatus.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to update order status';
       })
-      // Update order payment
-      .addCase(updateOrderPayment.fulfilled, (state, action) => {
-        const updatedOrder = action.payload;
-        
-        // Update in all arrays
-        state.orders = state.orders.map(order =>
-          order.id === updatedOrder.id ? updatedOrder : order
-        );
-        state.passengerOrders = state.passengerOrders.map(order =>
-          order.id === updatedOrder.id ? updatedOrder : order
-        );
-        state.driverOrders = state.driverOrders.map(order =>
-          order.id === updatedOrder.id ? updatedOrder : order
-        );
-        
-        // Update current order and order details
-        if (state.currentOrder?.id === updatedOrder.id) {
-          state.currentOrder = updatedOrder;
-        }
-        if (state.orderDetails?.id === updatedOrder.id) {
-          state.orderDetails = updatedOrder;
-        }
-      })
-      // Update order status bulk
-      .addCase(updateOrderStatusBulk.fulfilled, (state, action) => {
-        const updatedOrders = action.payload;
-        
-        // Create a map of updated orders for quick lookup
-        const updatedOrdersMap = new Map();
-        updatedOrders.forEach((order: { id: any; }) => {
-          updatedOrdersMap.set(order.id, order);
-        });
-        
-        // Update orders array
-        state.orders = state.orders.map(order =>
-          updatedOrdersMap.has(order.id) ? updatedOrdersMap.get(order.id) : order
-        );
-        
-        // Update passenger orders array
-        state.passengerOrders = state.passengerOrders.map(order =>
-          updatedOrdersMap.has(order.id) ? updatedOrdersMap.get(order.id) : order
-        );
-        
-        // Update driver orders array
-        state.driverOrders = state.driverOrders.map(order =>
-          updatedOrdersMap.has(order.id) ? updatedOrdersMap.get(order.id) : order
-        );
-      })
-      // Fetch order stats
-      .addCase(fetchOrderStats.fulfilled, (state, action) => {
-        const { total, status, paid } = action.payload;
-        state.stats = {
-          total: total?.total || 0,
-          pending: status?.pending || 0,
-          confirmed: status?.confirmed || 0,
-          preparing: status?.preparing || 0,
-          ready: status?.ready || 0,
-          in_delivery: status?.in_delivery || 0,
-          delivered: status?.delivered || 0,
-          cancelled: status?.cancelled || 0,
-          paid: paid?.paid || 0,
-          unpaid: paid?.unpaid || 0,
-        };
-      })
-      // Fetch passenger orders
-      .addCase(fetchPassengerOrders.pending, (state) => {
+      
+      // Update Payment Status
+      .addCase(updatePaymentStatus.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
-      .addCase(fetchPassengerOrders.fulfilled, (state, action) => {
+      .addCase(updatePaymentStatus.fulfilled, (state, action) => {
         state.loading = false;
-        state.passengerOrders = action.payload.orders || action.payload.data || action.payload;
-        state.totalPassengerOrders = action.payload.total || action.payload.count || state.passengerOrders.length;
+        state.currentOrder = action.payload.data;
+        state.success = true;
       })
-      .addCase(fetchPassengerOrders.rejected, (state, action) => {
+      .addCase(updatePaymentStatus.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch passenger orders';
+        state.error = action.error.message || 'Failed to update payment status';
       })
-      // Fetch driver orders
-      .addCase(fetchDriverOrders.pending, (state) => {
+      
+      // Get Total Orders
+      .addCase(getTotalOrders.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
-      .addCase(fetchDriverOrders.fulfilled, (state, action) => {
+      .addCase(getTotalOrders.fulfilled, (state, action) => {
         state.loading = false;
-        state.driverOrders = action.payload.orders || action.payload.data || action.payload;
-        state.totalDriverOrders = action.payload.total || action.payload.count || state.driverOrders.length;
+        state.stats.totalOrders = action.payload.data;
+        state.success = true;
       })
-      .addCase(fetchDriverOrders.rejected, (state, action) => {
+      .addCase(getTotalOrders.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch driver orders';
+        state.error = action.error.message || 'Failed to get total orders';
+      })
+      
+      // Get Paid Orders
+      .addCase(getPaidOrders.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getPaidOrders.fulfilled, (state, action) => {
+        state.loading = false;
+        state.stats.paidOrders = action.payload.data;
+        state.success = true;
+      })
+      .addCase(getPaidOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to get paid orders';
+      })
+      
+      // Get Orders by Status
+      .addCase(getOrdersByStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getOrdersByStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        const { status } = action.meta.arg;
+        state.stats.ordersByStatus[status] = action.payload.data;
+        state.success = true;
+      })
+      .addCase(getOrdersByStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to get orders by status';
       });
   },
 });
 
-export const {
-  clearOrders,
-  setCurrentOrder,
-  clearCurrentOrder,
-  clearOrderDetails,
-  clearError,
-  addOrder,
-  removeOrder,
-  updateOrderLocal,
-} = orderSlice.actions;
-
+export const { clearError, clearSuccess, setCurrentOrder, updateOrderInList } = orderSlice.actions;
 export default orderSlice.reducer;

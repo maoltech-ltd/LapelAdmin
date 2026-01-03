@@ -1,155 +1,78 @@
-import { useCallback } from 'react';
-import {
-  fetchOrders,
-  fetchOrderDetails,
-  bookOrder,
+// hooks/useOrder.ts
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+import { 
+  createOrder,
+  getOrderById,
+  getAllOrders,
+  getPassengerOrders,
+  getDriverOrders,
   updateOrderStatus,
-  updateOrderPayment,
-  updateOrderStatusBulk,
-  fetchOrderStats,
-  fetchPassengerOrders,
-  fetchDriverOrders,
-  clearOrders,
-  setCurrentOrder,
-  clearCurrentOrder,
-  clearOrderDetails,
-  updateOrderLocal,
+  updatePaymentStatus,
+  getTotalOrders,
+  getPaidOrders,
+  getOrdersByStatus,
+  clearError,
+  clearSuccess
 } from '../store/slices/orderSlice';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { OrderRequestDto, OrderSearchParams, OrderStatus, PaymentStatus } from '../types/order.types';
 
 export const useOrder = () => {
-  const dispatch = useAppDispatch();
-  const {
-    orders,
-    currentOrder,
-    passengerOrders,
-    driverOrders,
-    orderDetails,
-    loading,
-    error,
-    totalOrders,
-    totalPassengerOrders,
-    totalDriverOrders,
-    stats,
-  } = useAppSelector((state:any) => state.orders);
-
-  const getOrders = useCallback(
-    async (device: string, params?: any) => {
-      return dispatch(fetchOrders({ device, params }));
-    },
-    [dispatch]
-  );
-
-  const getOrderDetails = useCallback(
-    async (device: string, orderId: string) => {
-      return dispatch(fetchOrderDetails({ device, orderId }));
-    },
-    [dispatch]
-  );
-
-  const book = useCallback(
-    async (device: string, data: any) => {
-      return dispatch(bookOrder({ device, data }));
-    },
-    [dispatch]
-  );
-
-  const updateStatus = useCallback(
-    async (device: string, orderId: string, status: string) => {
-      return dispatch(updateOrderStatus({ device, orderId, status }));
-    },
-    [dispatch]
-  );
-
-  const updatePayment = useCallback(
-    async (device: string, orderId: string, paymentData: any) => {
-      return dispatch(updateOrderPayment({ device, orderId, paymentData }));
-    },
-    [dispatch]
-  );
-
-  const updateStatusBulk = useCallback(
-    async (device: string, orderIds: string[], status: string) => {
-      return dispatch(updateOrderStatusBulk({ device, data: { orderIds, status } }));
-    },
-    [dispatch]
-  );
-
-  const getStats = useCallback(
-    async (device: string) => {
-      return dispatch(fetchOrderStats(device));
-    },
-    [dispatch]
-  );
-
-  const getPassengerOrders = useCallback(
-    async (device: string, params?: any) => {
-      return dispatch(fetchPassengerOrders({ device, params }));
-    },
-    [dispatch]
-  );
-
-  const getDriverOrders = useCallback(
-    async (device: string, params?: any) => {
-      return dispatch(fetchDriverOrders({ device, params }));
-    },
-    [dispatch]
-  );
-
-  const clearAllOrders = useCallback(() => {
-    dispatch(clearOrders());
-  }, [dispatch]);
-
-  const setOrder = useCallback(
-    (order: any) => {
-      dispatch(setCurrentOrder(order));
-    },
-    [dispatch]
-  );
-
-  const clearOrder = useCallback(() => {
-    dispatch(clearCurrentOrder());
-  }, [dispatch]);
-
-  const clearDetails = useCallback(() => {
-    dispatch(clearOrderDetails());
-  }, [dispatch]);
-
-  const updateLocalOrder = useCallback(
-    (id: string, updates: any) => {
-      dispatch(updateOrderLocal({ id, updates }));
-    },
-    [dispatch]
-  );
+  const dispatch = useDispatch();
+  const { 
+    orders, 
+    passengerOrders, 
+    driverOrders, 
+    currentOrder, 
+    stats, 
+    loading, 
+    error, 
+    success 
+  } = useSelector((state: RootState) => state.orders);
 
   return {
     // State
     orders,
-    currentOrder,
     passengerOrders,
     driverOrders,
-    orderDetails,
+    currentOrder,
+    stats,
     loading,
     error,
-    totalOrders,
-    totalPassengerOrders,
-    totalDriverOrders,
-    stats,
-
+    success,
+    
     // Actions
-    getOrders,
-    getOrderDetails,
-    bookOrder: book,
-    updateOrderStatus: updateStatus,
-    updateOrderPayment: updatePayment,
-    updateOrderStatusBulk,
-    getOrderStats: getStats,
-    getPassengerOrders,
-    getDriverOrders,
-    clearOrders: clearAllOrders,
-    setCurrentOrder: setOrder,
-    clearCurrentOrder: clearOrder,
-    clearOrderDetails: clearDetails,
-    updateOrderLocal: updateLocalOrder,
+    createOrder: (device: string, userId: string, data: OrderRequestDto) => 
+      dispatch(createOrder({ device, userId, data }) as any),
+    
+    getOrderById: (device: string, orderId: string) => 
+      dispatch(getOrderById({ device, orderId }) as any),
+    
+    getAllOrders: (device: string, params: OrderSearchParams) => 
+      dispatch(getAllOrders({ device, params }) as any),
+    
+    getPassengerOrders: (device: string, userId: string) => 
+      dispatch(getPassengerOrders({ device, userId }) as any),
+    
+    getDriverOrders: (device: string, userId: string) => 
+      dispatch(getDriverOrders({ device, userId }) as any),
+    
+    updateOrderStatus: (device: string, orderId: string, status: OrderStatus, userId?: string) => 
+      dispatch(updateOrderStatus({ device, orderId, status, userId }) as any),
+    
+    updatePaymentStatus: (device: string, orderId: string, payment: PaymentStatus) => 
+      dispatch(updatePaymentStatus({ device, orderId, payment }) as any),
+    
+    getTotalOrders: (device: string) => 
+      dispatch(getTotalOrders(device) as any),
+    
+    getPaidOrders: (device: string) => 
+      dispatch(getPaidOrders(device) as any),
+    
+    getOrdersByStatus: (device: string, status: OrderStatus) => 
+      dispatch(getOrdersByStatus({ device, status }) as any),
+    
+    clearError: () => dispatch(clearError()),
+    clearSuccess: () => dispatch(clearSuccess()),
   };
 };

@@ -1,42 +1,55 @@
-import { useCallback } from 'react';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { fetchUsers, searchUsers, updateUser } from '../store/slices/userSlice';
+// hooks/useUser.ts (custom hook for React components)
+import { useDispatch, useSelector } from 'react-redux';
+import { 
+  searchUsers, 
+  getUserById, 
+  updateUser, 
+  deleteUser, 
+  changePassword, 
+  updateProfilePicture,
+  clearError,
+  clearSuccess,
+  setCurrentUser
+} from '../store/slices/userSlice';
+import { RootState } from '../store/store';
 
-export const useUsers = () => {
-  const dispatch = useAppDispatch();
-  const { users, currentUser, loading, error, total } = useAppSelector(
-    (state: any) => state.users
-  );
-
-  const getUsers = useCallback(
-    async (device: string, params?: any) => {
-      return dispatch(fetchUsers({ device, params }));
-    },
-    [dispatch]
-  );
-
-  const search = useCallback(
-    async (device: string, query: string) => {
-      return dispatch(searchUsers({ device, query }));
-    },
-    [dispatch]
-  );
-
-  const update = useCallback(
-    async (device: string, userId: string, data: any) => {
-      return dispatch(updateUser({ device, userId, data }));
-    },
-    [dispatch]
+export const useUser = () => {
+  const dispatch = useDispatch();
+  const { users, currentUser, loading, error, success } = useSelector(
+    (state: RootState) => state.users
   );
 
   return {
+    // State
     users,
     currentUser,
     loading,
     error,
-    total,
-    getUsers,
-    searchUsers: search,
-    updateUser: update,
+    success,
+    
+    // Actions
+    searchUsers: (device: string, params: any) => 
+      dispatch(searchUsers({ device, params }) as any),
+    
+    getUserById: (device: string, userId: string) => 
+      dispatch(getUserById({ device, userId }) as any),
+    
+    updateUser: (device: string, userId: string, data: any) => 
+      dispatch(updateUser({ device, userId, data }) as any),
+    
+    deleteUser: (device: string, userId: string) => 
+      dispatch(deleteUser({ device, userId }) as any),
+    
+    changePassword: (device: string, userId: string, data: any) => 
+      dispatch(changePassword({ device, userId, data }) as any),
+    
+    updateProfilePicture: (device: string, userId: string, imageUrl: string) => 
+      dispatch(updateProfilePicture({ device, userId, imageUrl }) as any),
+    
+    clearError: () => dispatch(clearError()),
+    clearSuccess: () => dispatch(clearSuccess()),
+    clearCurrentUser: (): void => {
+      dispatch(setCurrentUser(null))
+    },
   };
 };

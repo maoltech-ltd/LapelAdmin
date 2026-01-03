@@ -1,232 +1,319 @@
+// slices/rider.slice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { 
+  Rider, 
+  Vehicle,
+  BecomeARiderDto,
+  RiderSearchParams,
+  VehicleSearchParams,
+  ApiResponse,
+  PaginatedResponse 
+} from '../../types/rider.types';
 import { riderService } from '../../api/services';
 
-interface Rider {
-  id: string;
-  userId: string;
-  user?: {
-    name: string;
-    email: string;
-    phone: string;
-  };
-  vehicleType: string;
-  licenseNumber: string;
-  vehiclePlateNumber: string;
-  isAvailable: boolean;
-  status: string;
-  rating?: number;
-  totalRides?: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
 interface RiderState {
-  riders: Rider[];
+  riders: PaginatedResponse<Rider> | null;
+  vehicles: PaginatedResponse<Vehicle> | null;
   currentRider: Rider | null;
-  riderProfile: Rider | null;
+  currentVehicle: Vehicle | null;
+  stats: {
+    totalRiders: number | null;
+    availableRiders: number | null;
+  };
   loading: boolean;
   error: string | null;
-  total: number;
-  availableCount: number;
-  totalCount: number;
+  success: boolean;
 }
 
 const initialState: RiderState = {
-  riders: [],
+  riders: null,
+  vehicles: null,
   currentRider: null,
-  riderProfile: null,
+  currentVehicle: null,
+  stats: {
+    totalRiders: null,
+    availableRiders: null,
+  },
   loading: false,
   error: null,
-  total: 0,
-  availableCount: 0,
-  totalCount: 0,
+  success: false,
 };
 
-export const fetchRiders = createAsyncThunk(
-  'riders/fetchRiders',
-  async ({ device, params }: { device: string; params?: any }) => {
-    const response = await riderService.getRiders(device, params);
-    return response.data;
-  }
-);
-
-export const fetchRiderProfile = createAsyncThunk(
-  'riders/fetchRiderProfile',
-  async (device: string) => {
-    const response = await riderService.getRiderProfile(device);
-    return response.data;
-  }
-);
-
+// Async thunks
 export const registerRider = createAsyncThunk(
-  'riders/registerRider',
-  async (data: {
-    userId: string;
-    vehicleType: string;
-    licenseNumber: string;
-    vehiclePlateNumber: string;
-    device: string;
-  }) => {
-    const response = await riderService.registerRider(data);
-    return response.data;
+  'rider/registerRider',
+  async ({ device, userId, data }: { device: string; userId: string; data: BecomeARiderDto }) => {
+    return await riderService.registerRider(device, userId, data);
+  }
+);
+
+export const getRiderProfile = createAsyncThunk(
+  'rider/getRiderProfile',
+  async ({ device, userId }: { device: string; userId: string }) => {
+    return await riderService.getRiderProfile(device, userId);
+  }
+);
+
+export const getRiderVehicle = createAsyncThunk(
+  'rider/getRiderVehicle',
+  async ({ device, userId }: { device: string; userId: string }) => {
+    return await riderService.getRiderVehicle(device, userId);
   }
 );
 
 export const updateRiderAvailability = createAsyncThunk(
-  'riders/updateAvailability',
-  async (data: { isAvailable: boolean; device: string }) => {
-    const response = await riderService.updateAvailability(data);
-    return response.data;
+  'rider/updateRiderAvailability',
+  async ({ device, userId, available }: { device: string; userId: string; available: boolean }) => {
+    return await riderService.updateRiderAvailability(device, userId, available);
+  }
+);
+
+export const getAllRiders = createAsyncThunk(
+  'rider/getAllRiders',
+  async ({ device, params }: { device: string; params: RiderSearchParams }) => {
+    return await riderService.getAllRiders(device, params);
+  }
+);
+
+export const getAllVehicles = createAsyncThunk(
+  'rider/getAllVehicles',
+  async ({ device, params }: { device: string; params: VehicleSearchParams }) => {
+    return await riderService.getAllVehicles(device, params);
   }
 );
 
 export const activateRider = createAsyncThunk(
-  'riders/activateRider',
+  'rider/activateRider',
   async ({ device, riderId }: { device: string; riderId: string }) => {
-    const response = await riderService.activateRider(device, riderId);
-    return response.data;
+    return await riderService.activateRider(device, riderId);
   }
 );
 
 export const deactivateRider = createAsyncThunk(
-  'riders/deactivateRider',
-  async ({ device, riderId }: { device: string; riderId: string }) => {
-    const response = await riderService.deactivateRider(device, riderId);
-    return response.data;
+  'rider/deactivateRider',
+  async ({ device, userId }: { device: string; userId: string }) => {
+    return await riderService.deactivateRider(device, userId);
   }
 );
 
 export const deleteRider = createAsyncThunk(
-  'riders/deleteRider',
-  async ({ device, riderId }: { device: string; riderId: string }) => {
-    const response = await riderService.deleteRider(device, riderId);
-    return { riderId, ...response.data };
+  'rider/deleteRider',
+  async ({ device, userId }: { device: string; userId: string }) => {
+    return await riderService.deleteRider(device, userId);
   }
 );
 
-export const fetchRiderStats = createAsyncThunk(
-  'riders/fetchStats',
+export const getTotalRidersCount = createAsyncThunk(
+  'rider/getTotalRidersCount',
   async (device: string) => {
-    const [countResponse, availableResponse] = await Promise.all([
-      riderService.getRiderStatsCount(device),
-      riderService.getAvailableRidersCount(device),
-    ]);
-    return {
-      totalCount: countResponse.data.count || countResponse.data.total,
-      availableCount: availableResponse.data.count || availableResponse.data.available,
-    };
+    return await riderService.getTotalRidersCount(device);
+  }
+);
+
+export const getAvailableRidersCount = createAsyncThunk(
+  'rider/getAvailableRidersCount',
+  async (device: string) => {
+    return await riderService.getAvailableRidersCount(device);
   }
 );
 
 const riderSlice = createSlice({
-  name: 'riders',
+  name: 'rider',
   initialState,
   reducers: {
-    clearRiders: (state) => {
-      state.riders = [];
-      state.total = 0;
-    },
-    setCurrentRider: (state, action: PayloadAction<Rider>) => {
-      state.currentRider = action.payload;
-    },
-    clearCurrentRider: (state) => {
-      state.currentRider = null;
-    },
     clearError: (state) => {
       state.error = null;
+    },
+    clearSuccess: (state) => {
+      state.success = false;
+    },
+    setCurrentRider: (state, action: PayloadAction<Rider | null>) => {
+      state.currentRider = action.payload;
+    },
+    setCurrentVehicle: (state, action: PayloadAction<Vehicle | null>) => {
+      state.currentVehicle = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Fetch riders
-      .addCase(fetchRiders.pending, (state) => {
+      // Register Rider
+      .addCase(registerRider.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchRiders.fulfilled, (state, action) => {
-        state.loading = false;
-        state.riders = action.payload.riders || action.payload.data || action.payload;
-        state.total = action.payload.total || action.payload.count || state.riders.length;
-      })
-      .addCase(fetchRiders.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Failed to fetch riders';
-      })
-      // Fetch rider profile
-      .addCase(fetchRiderProfile.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(fetchRiderProfile.fulfilled, (state, action) => {
-        state.loading = false;
-        state.riderProfile = action.payload;
-      })
-      .addCase(fetchRiderProfile.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Failed to fetch rider profile';
-      })
-      // Register rider
-      .addCase(registerRider.pending, (state) => {
-        state.loading = true;
-      })
       .addCase(registerRider.fulfilled, (state, action) => {
         state.loading = false;
-        state.riders.push(action.payload);
-        state.total += 1;
+        state.currentRider = action.payload.data;
+        state.success = true;
       })
       .addCase(registerRider.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to register rider';
+        state.error = action.error.message || 'Failed to register as rider';
       })
-      // Update availability
+      
+      // Get Rider Profile
+      .addCase(getRiderProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getRiderProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentRider = action.payload.data;
+        state.success = true;
+      })
+      .addCase(getRiderProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to get rider profile';
+      })
+      
+      // Get Rider Vehicle
+      .addCase(getRiderVehicle.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getRiderVehicle.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentVehicle = action.payload.data;
+        state.success = true;
+      })
+      .addCase(getRiderVehicle.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to get rider vehicle';
+      })
+      
+      // Update Availability
       .addCase(updateRiderAvailability.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(updateRiderAvailability.fulfilled, (state, action) => {
         state.loading = false;
-        const updatedRider = action.payload;
-        const index = state.riders.findIndex(rider => rider.id === updatedRider.id);
-        if (index !== -1) {
-          state.riders[index] = updatedRider;
-        }
-        if (state.currentRider?.id === updatedRider.id) {
-          state.currentRider = updatedRider;
-        }
-        if (state.riderProfile?.id === updatedRider.id) {
-          state.riderProfile = updatedRider;
-        }
+        state.currentRider = action.payload.data;
+        state.success = true;
       })
       .addCase(updateRiderAvailability.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to update availability';
       })
-      // Activate rider
+      
+      // Get All Riders
+      .addCase(getAllRiders.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAllRiders.fulfilled, (state, action) => {
+        state.loading = false;
+        state.riders = action.payload.data;
+        state.success = true;
+      })
+      .addCase(getAllRiders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to get riders';
+      })
+      
+      // Get All Vehicles
+      .addCase(getAllVehicles.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAllVehicles.fulfilled, (state, action) => {
+        state.loading = false;
+        state.vehicles = action.payload.data;
+        state.success = true;
+      })
+      .addCase(getAllVehicles.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to get vehicles';
+      })
+      
+      // Activate Rider
+      .addCase(activateRider.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(activateRider.fulfilled, (state, action) => {
-        const updatedRider = action.payload;
-        const index = state.riders.findIndex(rider => rider.id === updatedRider.id);
-        if (index !== -1) {
-          state.riders[index] = updatedRider;
+        state.loading = false;
+        // Update the specific rider in the list if exists
+        if (state.riders && state.riders.content) {
+          const index = state.riders.content.findIndex(r => r.id === action.payload.data.id);
+          if (index !== -1) {
+            state.riders.content[index] = action.payload.data;
+          }
         }
+        state.success = true;
       })
-      // Deactivate rider
+      .addCase(activateRider.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to activate rider';
+      })
+      
+      // Deactivate Rider
+      .addCase(deactivateRider.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(deactivateRider.fulfilled, (state, action) => {
-        const updatedRider = action.payload;
-        const index = state.riders.findIndex(rider => rider.id === updatedRider.id);
-        if (index !== -1) {
-          state.riders[index] = updatedRider;
+        state.loading = false;
+        // Update the specific rider in the list if exists
+        if (state.riders && state.riders.content) {
+          const index = state.riders.content.findIndex(r => r.id === action.payload.data.id);
+          if (index !== -1) {
+            state.riders.content[index] = action.payload.data;
+          }
         }
+        state.success = true;
       })
-      // Delete rider
-      .addCase(deleteRider.fulfilled, (state, action) => {
-        state.riders = state.riders.filter(rider => rider.id !== action.payload.riderId);
-        state.total -= 1;
+      .addCase(deactivateRider.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to deactivate rider';
       })
-      // Fetch stats
-      .addCase(fetchRiderStats.fulfilled, (state, action) => {
-        state.totalCount = action.payload.totalCount;
-        state.availableCount = action.payload.availableCount;
+      
+      // Delete Rider
+      .addCase(deleteRider.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteRider.fulfilled, (state) => {
+        state.loading = false;
+        state.currentRider = null;
+        state.success = true;
+      })
+      .addCase(deleteRider.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to delete rider';
+      })
+      
+      // Get Total Riders Count
+      .addCase(getTotalRidersCount.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getTotalRidersCount.fulfilled, (state, action) => {
+        state.loading = false;
+        state.stats.totalRiders = action.payload.data;
+        state.success = true;
+      })
+      .addCase(getTotalRidersCount.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to get total riders count';
+      })
+      
+      // Get Available Riders Count
+      .addCase(getAvailableRidersCount.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAvailableRidersCount.fulfilled, (state, action) => {
+        state.loading = false;
+        state.stats.availableRiders = action.payload.data;
+        state.success = true;
+      })
+      .addCase(getAvailableRidersCount.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to get available riders count';
       });
   },
 });
 
-export const { clearRiders, setCurrentRider, clearCurrentRider, clearError } = riderSlice.actions;
+export const { clearError, clearSuccess, setCurrentRider, setCurrentVehicle } = riderSlice.actions;
 export default riderSlice.reducer;

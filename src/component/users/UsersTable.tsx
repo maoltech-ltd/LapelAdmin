@@ -1,6 +1,7 @@
 'use client';
 
-import { User } from "../../../data/user.mock";
+
+import { User } from "../../../lib/types/user.types";
 import StatusBadge from "../utils/StatusBadge";
 
 
@@ -31,15 +32,25 @@ export default function UsersTable({
               key={user.id}
               className="border-t dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50"
             >
-              <td className="px-4 py-3 font-medium">{user.name}</td>
+              <td className="px-4 py-3 font-medium">
+                {user.firstName} {user.lastName}
+              </td>
+
               <td className="px-4 py-3">
                 <div>{user.email}</div>
-                <div className="text-xs text-gray-500">{user.phone}</div>
+                <div className="text-xs text-gray-500">
+                  {user.phoneNumber}
+                </div>
               </td>
+
               <td className="px-4 py-3">
-                <StatusBadge status={user.status} />
+                <StatusBadge status={user.active ? 'active' : 'inactive'} />
               </td>
-              <td className="px-4 py-3">{user.rides}</td>
+
+              <td className="px-4 py-3">
+                {/* {user.rides } */}
+                0
+              </td>
               <td className="px-4 py-3 text-right">
                 <button
                   onClick={() => onViewUser(user)}

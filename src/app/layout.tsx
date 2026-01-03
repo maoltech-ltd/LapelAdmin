@@ -6,6 +6,7 @@ import Header from "@/component/layout/Header";
 import Footer from "@/component/layout/Footer";
 import Sidebar from "@/component/layout/Sidebar";
 import StoreProvider from "./StorProvider";
+import AppShell from "./appshell";
 
 const inter = localFont({
   src: [
@@ -46,26 +47,28 @@ export default function RootLayout({
         className={`${inter.variable} ${manrope.variable} antialiased bg-gray-50 dark:bg-gray-900`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <AppShell>{children}</AppShell>
+          <StoreProvider>
+            <AppShell>{children}</AppShell>
+          </StoreProvider>
         </ThemeProvider>
       </body>
     </html>
   );
 }
 
-function AppShell({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex min-h-screen flex-col">
-      <StoreProvider>
-        <Header />
-        <div className="flex flex-1">
-          <Sidebar />
-          <main className="flex-1 px-4 py-6 md:px-6">
-            {children}
-          </main>
-        </div>
-        <Footer />
-      </StoreProvider>  
-    </div>
-  );
-}
+// function AppShell({ children }: { children: React.ReactNode }) {
+//   return (
+//     <div className="flex min-h-screen flex-col">
+//       <StoreProvider>
+//         <Header />
+//         <div className="flex flex-1">
+//           <Sidebar />
+//           <main className="flex-1 px-4 py-6 md:px-6">
+//             {children}
+//           </main>
+//         </div>
+//         <Footer />
+//       </StoreProvider>  
+//     </div>
+//   );
+// }

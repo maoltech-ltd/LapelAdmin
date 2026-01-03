@@ -1,160 +1,145 @@
+// slices/admin.slice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { 
+  User,
+  PaginatedResponse 
+} from '../../types/user.types';
+import { UserSearchParams } from '../../types/admin.types';
 import { adminService } from '../../api/services';
 
-interface Admin {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 interface AdminState {
-  admins: Admin[];
-  currentAdmin: Admin | null;
+  admins: PaginatedResponse<User> | null;
+  currentAdmin: User | null;
   loading: boolean;
   error: string | null;
-  total: number;
+  success: boolean;
 }
 
 const initialState: AdminState = {
-  admins: [],
+  admins: null,
   currentAdmin: null,
   loading: false,
   error: null,
-  total: 0,
+  success: false,
 };
 
-export const fetchAdmins = createAsyncThunk(
-  'admins/fetchAdmins',
-  async ({ device, params }: { device: string; params?: any }) => {
-    const response = await adminService.getAdmins(device, params);
-    return response.data;
-  }
-);
-
-export const fetchAdminById = createAsyncThunk(
-  'admins/fetchAdminById',
-  async ({ device, id }: { device: string; id: string }) => {
-    const response = await adminService.getAdminById(device, id);
-    return response.data;
-  }
-);
-
+// Async thunks
 export const searchAdmins = createAsyncThunk(
-  'admins/searchAdmins',
-  async ({ device, query, params }: { device: string; query: string; params?: any }) => {
-    const response = await adminService.searchAdmins(device, query, params);
-    return response.data;
+  'admin/searchAdmins',
+  async ({ device, params }: { device: string; params: UserSearchParams }) => {
+    return await adminService.searchAdmins(device, params);
+  }
+);
+
+export const getAdminById = createAsyncThunk(
+  'admin/getAdminById',
+  async ({ device, id }: { device: string; id: string }) => {
+    return await adminService.getAdminById(device, id);
   }
 );
 
 export const updateAdmin = createAsyncThunk(
-  'admins/updateAdmin',
-  async ({ device, id, data }: { device: string; id: string; data: Partial<Admin> }) => {
-    const response = await adminService.updateAdmin(device, id, data);
-    return response.data;
+  'admin/updateAdmin',
+  async ({ device, data }: { device: string; data: Partial<User> }) => {
+    return await adminService.updateAdmin(device, data);
   }
 );
 
 export const deleteAdmin = createAsyncThunk(
-  'admins/deleteAdmin',
+  'admin/deleteAdmin',
   async ({ device, id }: { device: string; id: string }) => {
-    const response = await adminService.deleteAdmin(device, id);
-    return { id, ...response.data };
+    return await adminService.deleteAdmin(device, id);
   }
 );
 
 const adminSlice = createSlice({
-  name: 'admins',
+  name: 'admin',
   initialState,
   reducers: {
-    clearAdmins: (state) => {
-      state.admins = [];
-      state.total = 0;
-    },
-    setCurrentAdmin: (state, action: PayloadAction<Admin>) => {
-      state.currentAdmin = action.payload;
-    },
-    clearCurrentAdmin: (state) => {
-      state.currentAdmin = null;
-    },
     clearError: (state) => {
       state.error = null;
+    },
+    clearSuccess: (state) => {
+      state.success = false;
+    },
+    setCurrentAdmin: (state, action: PayloadAction<User | null>) => {
+      state.currentAdmin = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Fetch admins
-      .addCase(fetchAdmins.pending, (state) => {
+      // Search Admins
+      .addCase(searchAdmins.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchAdmins.fulfilled, (state, action) => {
-        state.loading = false;
-        state.admins = action.payload.admins || action.payload.data || action.payload;
-        state.total = action.payload.total || action.payload.count || state.admins.length;
-      })
-      .addCase(fetchAdmins.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Failed to fetch admins';
-      })
-      // Fetch admin by ID
-      .addCase(fetchAdminById.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(fetchAdminById.fulfilled, (state, action) => {
-        state.loading = false;
-        state.currentAdmin = action.payload;
-      })
-      .addCase(fetchAdminById.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Failed to fetch admin';
-      })
-      // Search admins
-      .addCase(searchAdmins.pending, (state) => {
-        state.loading = true;
-      })
       .addCase(searchAdmins.fulfilled, (state, action) => {
         state.loading = false;
-        state.admins = action.payload;
+        state.admins = action.payload.data;
+        state.success = true;
       })
       .addCase(searchAdmins.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to search admins';
       })
-      // Update admin
+      
+      // Get Admin by ID
+      .addCase(getAdminById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAdminById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentAdmin = action.payload.data;
+        state.success = true;
+      })
+      .addCase(getAdminById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to get admin';
+      })
+      
+      // Update Admin
       .addCase(updateAdmin.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(updateAdmin.fulfilled, (state, action) => {
         state.loading = false;
-        const updatedAdmin = action.payload;
-        const index = state.admins.findIndex(admin => admin.id === updatedAdmin.id);
-        if (index !== -1) {
-          state.admins[index] = updatedAdmin;
+        state.currentAdmin = action.payload.data;
+        // Update in list if exists
+        if (state.admins && state.admins.content) {
+          const index = state.admins.content.findIndex(a => a.id === action.payload.data.id);
+          if (index !== -1) {
+            state.admins.content[index] = action.payload.data;
+          }
         }
-        if (state.currentAdmin?.id === updatedAdmin.id) {
-          state.currentAdmin = updatedAdmin;
-        }
+        state.success = true;
       })
       .addCase(updateAdmin.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to update admin';
       })
-      // Delete admin
+      
+      // Delete Admin
       .addCase(deleteAdmin.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(deleteAdmin.fulfilled, (state, action) => {
         state.loading = false;
-        state.admins = state.admins.filter(admin => admin.id !== action.payload.id);
-        state.total -= 1;
-        if (state.currentAdmin?.id === action.payload.id) {
+        // Remove from list if exists
+        if (state.admins && state.admins.content) {
+          const index = state.admins.content.findIndex(a => a.id === action.meta.arg.id);
+          if (index !== -1) {
+            state.admins.content.splice(index, 1);
+            state.admins.totalElements -= 1;
+            state.admins.numberOfElements -= 1;
+          }
+        }
+        if (state.currentAdmin?.id === action.meta.arg.id) {
           state.currentAdmin = null;
         }
+        state.success = true;
       })
       .addCase(deleteAdmin.rejected, (state, action) => {
         state.loading = false;
@@ -163,5 +148,5 @@ const adminSlice = createSlice({
   },
 });
 
-export const { clearAdmins, setCurrentAdmin, clearCurrentAdmin, clearError } = adminSlice.actions;
+export const { clearError, clearSuccess, setCurrentAdmin } = adminSlice.actions;
 export default adminSlice.reducer;

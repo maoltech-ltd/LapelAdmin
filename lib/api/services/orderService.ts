@@ -1,45 +1,130 @@
-import axiosInstance from "../../axios/axiosInstance";
+// services/order.service.ts
+import axiosInstance from '../../axios/axiosInstance';
+import { 
+  OrderDto, 
+  OrderRequestDto, 
+  OrderStatus, 
+  PaymentStatus,
+  OrderSearchParams,
+  ApiResponse,
+  PaginatedResponse
+} from '../../types/order.types';
 
-interface OrderData {
-  // Define order data structure
-    userId: string;
-}
+const getHeaders = (userId?: string, orderId?: string) => {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  
+  if (userId) {
+    headers['USER-ID'] = userId;
+  }
+
+  if (orderId) {
+    headers['X-ORDER-ID'] = orderId;
+  }
+  
+  return { headers };
+};
 
 export const orderService = {
-  getOrders: (device: string, params?: any) =>
-    axiosInstance.get(`/api/v1/${device}/orders`, { params }),
+  // Create a new order
+  createOrder: async (device: string, userId: string, data: OrderRequestDto): Promise<ApiResponse<OrderDto>> => {
+    const response = await axiosInstance.post(
+      `/api/v1/${device}/orders/book`,
+      data,
+      getHeaders(userId)
+    );
+    return response.data;
+  },
 
-  getOrderDetails: (device: string, orderId: string) =>
-    axiosInstance.get(`/api/v1/${device}/orders/details`, {
-      params: { orderId },
-    }),
+  // Get order by ID
+  getOrderById: async (device: string, orderId: string): Promise<ApiResponse<OrderDto>> => {
+    const response = await axiosInstance.get(
+      `/api/v1/${device}/orders/details`,
+      getHeaders(undefined, orderId)
+    );
+    return response.data;
+  },
 
-  bookOrder: (device: string, data: OrderData) =>
-    axiosInstance.post(`/api/v1/${device}/orders/book`, data),
+  // Get all orders with pagination and search
+  getAllOrders: async (device: string, params: OrderSearchParams): Promise<ApiResponse<PaginatedResponse<OrderDto>>> => {
+    const response = await axiosInstance.get(`/api/v1/${device}/orders`, {
+      params,
+      ...getHeaders()
+    });
+    return response.data;
+  },
 
-  updateOrderStatus: (device: string, orderId: string, status: string) =>
-    axiosInstance.put(`/api/v1/${device}/orders/${orderId}/status`, {
-      status,
-    }),
+  // Get passenger's orders
+  getPassengerOrders: async (device: string, userId: string): Promise<ApiResponse<OrderDto[]>> => {
+    const response = await axiosInstance.get(
+      `/api/v1/${device}/orders/passenger`,
+      getHeaders(userId)
+    );
+    return response.data;
+  },
 
-  updateOrderPayment: (device: string, orderId: string, paymentData: any) =>
-    axiosInstance.put(`/api/v1/${device}/orders/${orderId}/payment`, paymentData),
+  // Get driver's orders
+  getDriverOrders: async (device: string, userId: string): Promise<ApiResponse<OrderDto[]>> => {
+    const response = await axiosInstance.get(
+      `/api/v1/${device}/orders/driver`,
+      getHeaders(userId)
+    );
+    return response.data;
+  },
 
-  updateOrderStatusBulk: (device: string, data: { orderIds: string[]; status: string }) =>
-    axiosInstance.patch(`/api/v1/${device}/orders/status`, data),
+  // Update order status
+  updateOrderStatus: async (device: string, orderId: string, status: OrderStatus, userId?: string): Promise<ApiResponse<OrderDto>> => {
+    const endpoint = userId 
+      ? `/api/v1/${device}/orders/${orderId}/status`
+      : `/api/v1/${device}/orders/status`;
+    
+    const response = await axiosInstance.put(
+      endpoint,
+      null,
+      {
+        params: { status },
+        headers: userId ? getHeaders(userId, orderId).headers : getHeaders(undefined, orderId).headers
+      }
+    );
+    return response.data;
+  },
 
-  getOrderStatsTotal: (device: string) =>
-    axiosInstance.get(`/api/v1/${device}/orders/stats/total`),
+  // Update payment status
+  updatePaymentStatus: async (device: string, orderId: string, payment: PaymentStatus): Promise<ApiResponse<OrderDto>> => {
+    const response = await axiosInstance.put(
+      `/api/v1/${device}/orders/${orderId}/payment`,
+      null,
+      {
+        params: { payment },
+        headers: getHeaders(undefined, orderId).headers
+      }
+    );
+    return response.data;
+  },
 
-  getOrderStatsStatus: (device: string) =>
-    axiosInstance.get(`/api/v1/${device}/orders/stats/status`),
+  // Statistics
+  getTotalOrders: async (device: string): Promise<ApiResponse<number>> => {
+    const response = await axiosInstance.get(
+      `/api/v1/${device}/orders/stats/total`
+    );
+    return response.data;
+  },
 
-  getOrderStatsPaid: (device: string) =>
-    axiosInstance.get(`/api/v1/${device}/orders/stats/paid`),
+  getPaidOrders: async (device: string): Promise<ApiResponse<number>> => {
+    const response = await axiosInstance.get(
+      `/api/v1/${device}/orders/stats/paid`
+    );
+    return response.data;
+  },
 
-  getPassengerOrders: (device: string, params?: any) =>
-    axiosInstance.get(`/api/v1/${device}/orders/passenger`, { params }),
-
-  getDriverOrders: (device: string, params?: any) =>
-    axiosInstance.get(`/api/v1/${device}/orders/driver`, { params }),
+  getOrdersByStatus: async (device: string, status: OrderStatus): Promise<ApiResponse<number>> => {
+    const response = await axiosInstance.get(
+      `/api/v1/${device}/orders/stats/status`,
+      {
+        params: { status }
+      }
+    );
+    return response.data;
+  }
 };

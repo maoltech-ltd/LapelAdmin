@@ -1,176 +1,82 @@
-import { useCallback } from 'react';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
-import {
-  fetchWallets,
-  fetchWalletById,
+// hooks/useWallet.ts
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+import { 
   createWallet,
-  debitWallet,
+  getWallet,
+  getBalance,
+  getSummary,
   creditWallet,
-  fetchWalletSummary,
-  fetchWalletBalance,
-  fetchWalletStats,
+  debitWallet,
+  getAllWallets,
   activateWallet,
   deactivateWallet,
   deleteWallet,
-  clearWallets,
-  setCurrentWallet,
-  clearCurrentWallet,
-  clearWalletData,
-  updateWalletBalance,
-  addTransaction,
+  getTotalWalletCount,
+  getActiveWalletCount,
+  clearError,
+  clearSuccess
 } from '../store/slices/walletSlice';
+import { CreateWalletDTO, WalletSearchParams } from '../types/wallet.types';
 
 export const useWallet = () => {
-  const dispatch = useAppDispatch();
-  const {
-    wallets,
-    currentWallet,
-    walletBalance,
-    walletSummary,
-    walletStats,
-    loading,
-    error,
-    totalWallets,
-  } = useAppSelector((state) => state.wallets);
-
-  const getWallets = useCallback(
-    async (device: string, params?: any) => {
-      return dispatch(fetchWallets({ device, params }));
-    },
-    [dispatch]
-  );
-
-  const getWallet = useCallback(
-    async (device: string, walletId: string) => {
-      return dispatch(fetchWalletById({ device, walletId }));
-    },
-    [dispatch]
-  );
-
-  const create = useCallback(
-    async (device: string, data: any) => {
-      return dispatch(createWallet({ device, data }));
-    },
-    [dispatch]
-  );
-
-  const debit = useCallback(
-    async (device: string, data: any) => {
-      return dispatch(debitWallet({ device, data }));
-    },
-    [dispatch]
-  );
-
-  const credit = useCallback(
-    async (device: string, data: any) => {
-      return dispatch(creditWallet({ device, data }));
-    },
-    [dispatch]
-  );
-
-  const getSummary = useCallback(
-    async (device: string) => {
-      return dispatch(fetchWalletSummary(device));
-    },
-    [dispatch]
-  );
-
-  const getBalance = useCallback(
-    async (device: string) => {
-      return dispatch(fetchWalletBalance(device));
-    },
-    [dispatch]
-  );
-
-  const getStats = useCallback(
-    async (device: string) => {
-      return dispatch(fetchWalletStats(device));
-    },
-    [dispatch]
-  );
-
-  const activate = useCallback(
-    async (device: string, walletId: string) => {
-      return dispatch(activateWallet({ device, walletId }));
-    },
-    [dispatch]
-  );
-
-  const deactivate = useCallback(
-    async (device: string, walletId: string) => {
-      return dispatch(deactivateWallet({ device, walletId }));
-    },
-    [dispatch]
-  );
-
-  const remove = useCallback(
-    async (device: string, walletId: string) => {
-      return dispatch(deleteWallet({ device, walletId }));
-    },
-    [dispatch]
-  );
-
-  const clearAllWallets = useCallback(() => {
-    dispatch(clearWallets());
-  }, [dispatch]);
-
-  const setWallet = useCallback(
-    (wallet: any) => {
-      dispatch(setCurrentWallet(wallet));
-    },
-    [dispatch]
-  );
-
-  const clearWallet = useCallback(() => {
-    dispatch(clearCurrentWallet());
-  }, [dispatch]);
-
-  const clearData = useCallback(() => {
-    dispatch(clearWalletData());
-  }, [dispatch]);
-
-  const updateBalance = useCallback(
-    (walletId: string, balance: number) => {
-      dispatch(updateWalletBalance({ walletId, balance }));
-    },
-    [dispatch]
-  );
-
-  const addNewTransaction = useCallback(
-    (walletId: string, transaction: any) => {
-      dispatch(addTransaction({ walletId, transaction }));
-    },
-    [dispatch]
-  );
+  const dispatch = useDispatch();
+  const { 
+    wallets, 
+    currentWallet, 
+    stats, 
+    loading, 
+    error, 
+    success 
+  } = useSelector((state: RootState) => state.wallets);
 
   return {
     // State
     wallets,
     currentWallet,
-    walletBalance,
-    walletSummary,
-    walletStats,
+    stats,
     loading,
     error,
-    totalWallets,
-
+    success,
+    
     // Actions
-    getWallets,
-    getWallet,
-    createWallet: create,
-    debitWallet: debit,
-    creditWallet: credit,
-    getWalletSummary: getSummary,
-    getWalletBalance: getBalance,
-    getWalletStats: getStats,
-    activateWallet: activate,
-    deactivateWallet: deactivate,
-    deleteWallet: remove,
-    clearWallets: clearAllWallets,
-    setCurrentWallet: setWallet,
-    clearCurrentWallet: clearWallet,
-    clearWalletData: clearData,
-    updateWalletBalance: updateBalance,
-    addTransaction: addNewTransaction,
+    createWallet: (device: string, userId: string, data: CreateWalletDTO) => 
+      dispatch(createWallet({ device, userId, data }) as any),
+    
+    getWallet: (device: string, userId: string) => 
+      dispatch(getWallet({ device, userId }) as any),
+    
+    getBalance: (device: string, userId: string) => 
+      dispatch(getBalance({ device, userId }) as any),
+    
+    getSummary: (device: string, userId: string) => 
+      dispatch(getSummary({ device, userId }) as any),
+    
+    creditWallet: (device: string, userId: string, amount: number) => 
+      dispatch(creditWallet({ device, userId, amount }) as any),
+    
+    debitWallet: (device: string, userId: string, amount: number) => 
+      dispatch(debitWallet({ device, userId, amount }) as any),
+    
+    getAllWallets: (device: string, params: WalletSearchParams) => 
+      dispatch(getAllWallets({ device, params }) as any),
+    
+    activateWallet: (device: string, walletId: string) => 
+      dispatch(activateWallet({ device, walletId }) as any),
+    
+    deactivateWallet: (device: string, walletId: string) => 
+      dispatch(deactivateWallet({ device, walletId }) as any),
+    
+    deleteWallet: (device: string, walletId: string) => 
+      dispatch(deleteWallet({ device, walletId }) as any),
+    
+    getTotalWalletCount: (device: string) => 
+      dispatch(getTotalWalletCount(device) as any),
+    
+    getActiveWalletCount: (device: string) => 
+      dispatch(getActiveWalletCount(device) as any),
+    
+    clearError: () => dispatch(clearError()),
+    clearSuccess: () => dispatch(clearSuccess()),
   };
 };
