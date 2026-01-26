@@ -21,7 +21,8 @@ export const useAuth = () => {
     loading, 
     error, 
     success, 
-    isAuthenticated 
+    isAuthenticated,
+    authChecked 
   } = useSelector((state: RootState) => state.auth);
 
   return {
@@ -33,6 +34,7 @@ export const useAuth = () => {
     error,
     success,
     isAuthenticated,
+    authChecked,
     
     // Actions
     login: (device: string, data: any) => 

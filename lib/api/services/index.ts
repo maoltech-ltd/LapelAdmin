@@ -8,3 +8,4 @@ export * from './riderService';
 export * from './roleService';
 export * from './onboardService';
 export * from './dashboardService';
+export * from './transactionService';

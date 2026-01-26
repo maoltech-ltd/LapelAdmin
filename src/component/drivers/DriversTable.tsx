@@ -3,14 +3,14 @@
 import StatusBadge from '@/component/utils/StatusBadge';
 import VerificationStatusBadge from './VerificationStatusBadge';
 import RatingSummary from './RatingSummary';
-import { Driver } from '../../../data/driver.mock';
+import { Rider } from '../../../lib/types/rider.types';
 
 export default function DriversTable({
   drivers,
   onView,
 }: {
-  drivers: Driver[];
-  onView: (driver: Driver) => void;
+  drivers: Rider[];
+  onView: (driver: Rider) => void;
 }) {
   return (
     <div className="overflow-x-auto rounded-xl border bg-white dark:border-gray-800 dark:bg-gray-900">
@@ -32,22 +32,22 @@ export default function DriversTable({
               className="border-t hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800/50"
             >
               <td className="px-4 py-3">
-                <div className="font-medium">{d.name}</div>
-                <div className="text-xs text-gray-500">{d.phone}</div>
+                <div className="font-medium">{d.user?.username || d.user?.firstName}</div>
+                <div className="text-xs text-gray-500">{d.user?.phoneNumber}</div>
               </td>
 
               <td className="px-4 py-3">
-                <div>{d.vehicle.type}</div>
-                <div className="text-xs text-gray-500">{d.vehicle.plateNumber}</div>
+                <div>{d.vehicle?.make}</div>
+                <div className="text-xs text-gray-500">{d.vehicle?.licensePlateNumber}</div>
               </td>
 
               <td className="px-4 py-3 space-y-1">
-                <VerificationStatusBadge status={d.verificationStatus} />
-                <StatusBadge status={d.status} />
+                <VerificationStatusBadge status={d.user?.active ? 'approved' : 'pending'} />
+                <StatusBadge status={d.available ? 'active' : 'inactive'} />
               </td>
 
               <td className="px-4 py-3">
-                <RatingSummary rating={d.rating} trips={d.totalTrips} />
+                <RatingSummary rating={d?.rating} trips={20} />
               </td>
 
               <td className="px-4 py-3 text-right">

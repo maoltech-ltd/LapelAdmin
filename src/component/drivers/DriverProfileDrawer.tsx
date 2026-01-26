@@ -1,7 +1,7 @@
 'use client';
 
 
-import { Driver } from '../../../data/driver.mock';
+import { Rider } from '../../../lib/types/rider.types';
 import DocumentViewer from './DocumentViewer';
 import RatingSummary from './RatingSummary';
 
@@ -10,7 +10,7 @@ export default function DriverProfileDrawer({
   open,
   onClose,
 }: {
-  driver: Driver | null;
+  driver: Rider | null;
   open: boolean;
   onClose: () => void;
 }) {
@@ -22,7 +22,7 @@ export default function DriverProfileDrawer({
         
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">{driver.name}</h2>
+          <h2 className="text-lg font-semibold">{driver.user?.username || driver.user?.firstName}</h2>
           <button onClick={onClose}>✕</button>
         </div>
 
@@ -30,27 +30,27 @@ export default function DriverProfileDrawer({
         <div className="mt-4 space-y-4 text-sm">
           <section>
             <h3 className="font-medium">Personal Info</h3>
-            <p>{driver.email}</p>
-            <p>{driver.phone}</p>
+            <p>{driver.user?.email || driver.user?.phoneNumber || 'N/A'}</p>
+            <p>{driver.user?.phoneNumber || 'N/A'}</p>
           </section>
 
           <section>
             <h3 className="font-medium">Vehicle Info</h3>
-            <p>{driver.vehicle.type}</p>
-            <p>{driver.vehicle.plateNumber}</p>
-            <p>{driver.vehicle.color}</p>
+            <p>{driver.vehicle?.make}</p>
+            <p>{driver.vehicle?.licensePlateNumber}</p>
+            <p>{driver.vehicle?.color}</p>
           </section>
 
           <section className="grid grid-cols-2 gap-4">
-            <DocumentViewer label="Driver License" url={driver.documents.license} />
-            <DocumentViewer label="Vehicle Document" url={driver.documents.vehiclePaper} />
+            <DocumentViewer label="Driver License" url={driver.vehicle?.licensePlateNumber} />
+            <DocumentViewer label="Vehicle Document" url={driver.vehicle?.licensePlateNumber} />
           </section>
 
           <section>
             <h3 className="font-medium">Performance</h3>
-            <RatingSummary rating={driver.rating} trips={driver.totalTrips} />
+            <RatingSummary rating={driver?.rating} trips={20} />
             <p className="text-xs text-gray-500">
-              Earnings: ₦{driver.earnings.toLocaleString()}
+              Earnings: ₦{100000000}
             </p>
           </section>
 

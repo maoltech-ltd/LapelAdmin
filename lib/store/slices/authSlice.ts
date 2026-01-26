@@ -17,6 +17,7 @@ interface AuthState {
   error: string | null;
   success: boolean;
   isAuthenticated: boolean;
+  authChecked: boolean;
 }
 
 const initialState: AuthState = {
@@ -27,20 +28,21 @@ const initialState: AuthState = {
   error: null,
   success: false,
   isAuthenticated: false,
+  authChecked: false,
 };
 
 // Check for existing token in localStorage on initial load
-if (typeof window !== 'undefined') {
-  const savedToken = localStorage.getItem('adminToken');
-  const savedUser = localStorage.getItem('adminUser');
-  if (savedToken && savedUser) {
-    initialState.token = savedToken;
-    initialState.user = JSON.parse(savedUser);
-    initialState.isAuthenticated = true;
-    // Set default axios header
-    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
-  }
-}
+// if (typeof window !== 'undefined') {
+//   const savedToken = localStorage.getItem('adminToken');
+//   const savedUser = localStorage.getItem('adminUser');
+//   if (savedToken && savedUser) {
+//     initialState.token = savedToken;
+//     initialState.user = JSON.parse(savedUser);
+//     initialState.isAuthenticated = true;
+//     // Set default axios header
+//     axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
+//   }
+// }
 
 // Async thunks
 export const login = createAsyncThunk(
@@ -78,6 +80,7 @@ export const changePassword = createAsyncThunk(
   }
 );
 
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -110,6 +113,7 @@ const authSlice = createSlice({
       state.user = action.payload.user;
       state.role = action.payload.role;
       state.isAuthenticated = true;
+      state.authChecked = true;
       
       // Save to localStorage
       if (typeof window !== 'undefined') {
@@ -135,12 +139,13 @@ const authSlice = createSlice({
         state.role = action.payload.data.role;
         state.isAuthenticated = true;
         state.success = true;
+        state.authChecked = true;
         
         // Save to localStorage
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('adminToken', action.payload.data.token);
-          localStorage.setItem('adminUser', JSON.stringify(action.payload.data.user));
-        }
+        // if (typeof window !== 'undefined') {
+        //   localStorage.setItem('adminToken', action.payload.data.token);
+        //   localStorage.setItem('adminUser', JSON.stringify(action.payload.data.user));
+        // }
         
         // Set axios header
         axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${action.payload.data.token}`;
@@ -161,6 +166,7 @@ const authSlice = createSlice({
         state.user = action.payload.data;
         state.isAuthenticated = true;
         state.success = true;
+        state.authChecked = true;
       })
       .addCase(getCurrentAdmin.rejected, (state, action) => {
         state.loading = false;

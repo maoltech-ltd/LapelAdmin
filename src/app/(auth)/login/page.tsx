@@ -135,17 +135,23 @@ import { useAuth } from '../../../../lib/hooks/useAuth';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, loading, error, isAuthenticated, clearError } = useAuth();
+  const { login, loading, error, isAuthenticated, authChecked, clearError } = useAuth();
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
+  // useEffect(() => {
+  //   if (isAuthenticated) {
+  //     router.replace('/dashboard');
+  //   }
+  // }, [isAuthenticated, router]);
+
   useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/dashboard');
+    if (!loading && authChecked && isAuthenticated) {
+        router.replace('/dashboard');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, authChecked, loading]);
 
   useEffect(() => {
     return () => {

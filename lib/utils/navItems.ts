@@ -42,6 +42,12 @@ const navItems = [
     permissions: ['TRANSACTION_READ'],
   },
   {
+    label: 'Transactions',
+    href: '/transactions',
+    icon: Currency,
+    permissions: ['TRANSACTION_READ'],
+  },
+  {
     label: 'Roles & Permissions',
     href: '/roles-permissions',
     icon: ShieldCheck,

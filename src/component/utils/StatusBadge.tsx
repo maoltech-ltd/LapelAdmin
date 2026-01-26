@@ -1,6 +1,6 @@
 'use client';
 
-type Status =
+export type Status =
   // Users / Drivers
   | 'active'
   | 'inactive'
