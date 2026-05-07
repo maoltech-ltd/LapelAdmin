@@ -209,6 +209,11 @@ export default function DriversPage() {
         driver={selected}
         open={!!selected}
         onClose={() => setSelected(null)}
+        onReviewed={() => getAllRiders(DEVICE, {
+          query: search || undefined,
+          page,
+          size: PAGE_SIZE,
+        })}
       />
     </div>
   );

@@ -5,6 +5,15 @@ import VerificationStatusBadge from './VerificationStatusBadge';
 import RatingSummary from './RatingSummary';
 import { Rider } from '../../../lib/types/rider.types';
 
+type VerificationBadgeStatus =
+  | 'pending'
+  | 'approved'
+  | 'rejected'
+  | 'under_review'
+  | 'accepted'
+  | 'declined'
+  | 'not_submitted';
+
 export default function DriversTable({
   drivers,
   onView,
@@ -42,7 +51,7 @@ export default function DriversTable({
               </td>
 
               <td className="px-4 py-3 space-y-1">
-                <VerificationStatusBadge status={d.user?.active ? 'approved' : 'pending'} />
+                <VerificationStatusBadge status={normalizeStatus(d.documentReviewStatus)} />
                 <StatusBadge status={d.available ? 'active' : 'inactive'} />
               </td>
 
@@ -64,4 +73,17 @@ export default function DriversTable({
       </table>
     </div>
   );
+}
+
+function normalizeStatus(status?: string): VerificationBadgeStatus {
+  switch (status) {
+    case 'ACCEPTED':
+      return 'accepted';
+    case 'DECLINED':
+      return 'declined';
+    case 'UNDER_REVIEW':
+      return 'under_review';
+    default:
+      return 'not_submitted';
+  }
 }

@@ -2,13 +2,24 @@
 import { User } from './user.types';
 
 export interface Vehicle {
+  id?: string;
   make: string;
   model: string;
   year: number;
   color: string;
   licensePlateNumber: string;
   seats: number;
+  vehicleLicense?: string;
+  vehicleLicenseNumber?: string;
+  documentReviewStatus?: DocumentReviewStatus;
+  documentReviewReason?: string;
 }
+
+export type DocumentReviewStatus =
+  | 'NOT_SUBMITTED'
+  | 'UNDER_REVIEW'
+  | 'ACCEPTED'
+  | 'DECLINED';
 
 export interface Rider {
   id?: string;
@@ -16,6 +27,16 @@ export interface Rider {
   vehicle: Vehicle;
   available: boolean;
   rating: number;
+  driverLicense?: string;
+  driverLicenseNumber?: string;
+  documentReviewStatus?: DocumentReviewStatus;
+  documentReviewReason?: string;
+}
+
+export interface DocumentReviewDecision {
+  status: 'ACCEPTED' | 'DECLINED';
+  reason?: string;
+  templateReasonCode?: string;
 }
 
 export interface BecomeARiderDto {
@@ -27,6 +48,8 @@ export interface BecomeARiderDto {
   color: string;
   licensePlateNumber: string;
   seats: number;
+  vehicleLicense?: string;
+  vehicleLicenseNumber?: string;
 }
 
 export interface RiderSearchParams {

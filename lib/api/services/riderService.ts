@@ -7,6 +7,7 @@ import {
   RiderSearchParams,
   VehicleSearchParams,
   AvailabilityUpdate,
+  DocumentReviewDecision,
   ApiResponse,
   PaginatedResponse
 } from '../../types/rider.types';
@@ -97,6 +98,24 @@ export const riderService = {
       `/api/v1/${device}/riders/${userId}/deactivate`,
       null,
       getHeaders(userId)
+    );
+    return response.data;
+  },
+
+  reviewRiderDocuments: async (device: string, riderId: string, data: DocumentReviewDecision): Promise<ApiResponse<Rider>> => {
+    const response = await axiosInstance.patch(
+      `/api/v1/${device}/riders/${riderId}/documents/review`,
+      data,
+      getHeaders()
+    );
+    return response.data;
+  },
+
+  reviewVehicleDocuments: async (device: string, vehicleId: string, data: DocumentReviewDecision): Promise<ApiResponse<Vehicle>> => {
+    const response = await axiosInstance.patch(
+      `/api/v1/${device}/riders/vehicles/${vehicleId}/documents/review`,
+      data,
+      getHeaders()
     );
     return response.data;
   },
