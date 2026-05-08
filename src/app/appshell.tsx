@@ -16,7 +16,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthGuard>
-      <div className="flex min-h-screen flex-col">
+      <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
         <Header />
         <div className="flex flex-1">
           <Sidebar />

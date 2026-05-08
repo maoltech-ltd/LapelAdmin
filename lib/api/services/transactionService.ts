@@ -34,6 +34,28 @@ export const transactionService = {
     );
 
     return response.data;
+  },
+
+  retryTransaction: async (
+    device: string,
+    reference: string
+  ): Promise<ApiResponse<Transaction>> => {
+    const response = await axiosInstance.post(
+      `/api/v1/${device}/transactions/${reference}/retry`
+    );
+
+    return response.data;
+  },
+
+  flagTransaction: async (
+    device: string,
+    reference: string
+  ): Promise<ApiResponse<Transaction>> => {
+    const response = await axiosInstance.post(
+      `/api/v1/${device}/transactions/${reference}/flag`
+    );
+
+    return response.data;
   }
 
 };

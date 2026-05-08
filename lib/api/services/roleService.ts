@@ -11,7 +11,7 @@ interface RoleData {
 }
 
 interface PermissionData {
-  permissionId: string;
+  permission: string;
   action: 'add' | 'remove';
 }
 
@@ -38,28 +38,26 @@ export const roleService = {
 
   addPermissionToRole: (roleId: string, permissionId: string) =>
     axiosInstance.post(`/api/admin/roles/${roleId}/permissions`, {
-      permissionId,
+      permission: permissionId,
     }),
 
   updateRolePermissions: (roleId: string, permissions: string[]) =>
-    axiosInstance.put(`/api/admin/roles/${roleId}/permissions`, {
-      permissions,
-    }),
+    axiosInstance.put(`/api/admin/roles/${roleId}/permissions`, permissions),
 
   removePermissionFromRole: (roleId: string, permissionId: string) =>
     axiosInstance.delete(`/api/admin/roles/${roleId}/permissions`, {
-      data: { permissionId },
+      data: { permission: permissionId },
     }),
 
   // Bulk permission operations
   manageRolePermissions: (roleId: string, data: PermissionData) => {
     if (data.action === 'add') {
       return axiosInstance.post(`/api/admin/roles/${roleId}/permissions`, {
-        permissionId: data.permissionId,
+        permission: data.permission,
       });
     } else {
       return axiosInstance.delete(`/api/admin/roles/${roleId}/permissions`, {
-        data: { permissionId: data.permissionId },
+        data: { permission: data.permission },
       });
     }
   },

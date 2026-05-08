@@ -14,7 +14,9 @@ export const rideService = {
     axiosInstance.get(`/api/v1/${device}/rides/${rideId}`),
 
   updateRideStatus: (device: string, rideId: string, status: string) =>
-    axiosInstance.put(`/api/v1/${device}/rides/${rideId}/status`, { status }),
+    axiosInstance.put(`/api/v1/${device}/rides/${rideId}/status`, null, {
+      params: { status },
+    }),
 
   persistRide: (device: string, data: RideData) =>
     axiosInstance.post(`/api/v1/${device}/rides/persist`, data),

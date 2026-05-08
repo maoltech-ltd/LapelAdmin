@@ -1,50 +1,57 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { Ride, rides } from '../../../data/ride.mock';
-
+import { useEffect, useMemo, useState } from 'react';
+import { Loader } from 'lucide-react';
 import RidesTable from '@/component/rides/RidesTable';
 import RideDetailsDrawer from '@/component/rides/RideDetailsDrawer';
 import TableFilterBar from '@/component/filters/TableFilterBar';
-import Pagination from '@/component/utils/Pagination';
+import { useRide } from '../../../lib/hooks/useRide';
+import { AdminRide, rideAddress } from '../../../lib/types/adminRide.types';
 
-const PAGE_SIZE = 5;
+const DEVICE = 'web';
 
 export default function RidesPage() {
-  const [selected, setSelected] = useState<Ride | null>(null);
-
+  const { rideHistory, loading, error, getRideHistory, updateRideStatus } = useRide();
+  const [selected, setSelected] = useState<AdminRide | null>(null);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('all');
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
-  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    getRideHistory(DEVICE, {
+      status: status === 'all' ? undefined : status.toUpperCase(),
+      fromDate: from || undefined,
+      toDate: to || undefined,
+    });
+  }, [status, from, to, getRideHistory]);
 
   const filtered = useMemo(() => {
-    return rides.filter((r) => {
+    return (rideHistory as AdminRide[]).filter((ride) => {
+      const query = search.toLowerCase();
       const matchesSearch =
-        r.origin.toLowerCase().includes(search.toLowerCase()) ||
-        r.destination.toLowerCase().includes(search.toLowerCase()) ||
-        r.driverName.toLowerCase().includes(search.toLowerCase());
+        rideAddress(ride.origin).toLowerCase().includes(query) ||
+        rideAddress(ride.destination).toLowerCase().includes(query) ||
+        (ride.riderId || '').toLowerCase().includes(query) ||
+        (ride.vehicleId || '').toLowerCase().includes(query);
 
-      const matchesStatus =
-        status === 'all' || r.status === status;
-
-      const created = new Date(r.createdAt).getTime();
-      const afterFrom = from ? created >= new Date(from).getTime() : true;
-      const beforeTo = to ? created <= new Date(to).getTime() : true;
-
-      return matchesSearch && matchesStatus && afterFrom && beforeTo;
+      return matchesSearch;
     });
-  }, [search, status, from, to]);
+  }, [rideHistory, search]);
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const handleCancel = async (rideId: string) => {
+    await updateRideStatus(DEVICE, rideId, 'CANCELLED');
+    await getRideHistory(DEVICE);
+    setSelected(null);
+  };
 
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold">Rides Management</h1>
-        <p className="text-sm text-gray-500">
+        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+          Rides Management
+        </h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           Monitor and manage ride offers created by drivers
         </p>
       </header>
@@ -60,23 +67,27 @@ export default function RidesPage() {
         onToChange={setTo}
         statusOptions={[
           { label: 'All', value: 'all' },
-          { label: 'Scheduled', value: 'scheduled' },
+          { label: 'Pending', value: 'pending' },
           { label: 'Ongoing', value: 'ongoing' },
           { label: 'Completed', value: 'completed' },
           { label: 'Cancelled', value: 'cancelled' },
         ]}
       />
 
-      <RidesTable rides={paginated} onView={setSelected} />
-
-      {totalPages > 1 && (
-        <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+      {loading && <Loader className="h-5 w-5 animate-spin text-blue-600" />}
+      {error && (
+        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300">
+          {error}
+        </div>
       )}
+
+      <RidesTable rides={filtered} onView={setSelected} />
 
       <RideDetailsDrawer
         ride={selected}
         open={!!selected}
         onClose={() => setSelected(null)}
+        onCancel={handleCancel}
       />
     </div>
   );

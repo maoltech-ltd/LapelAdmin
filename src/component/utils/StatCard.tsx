@@ -10,14 +10,14 @@ export default function StatCard({
   variant = 'default',
 }: StatCardProps) {
   const variants = {
-    default: 'text-gray-800',
-    success: 'text-green-600',
-    danger: 'text-red-600',
+    default: 'text-slate-900 dark:text-slate-100',
+    success: 'text-green-600 dark:text-green-400',
+    danger: 'text-red-600 dark:text-red-400',
   };
 
   return (
-    <div className="rounded-xl bg-white p-4 shadow">
-      <p className="text-xs text-gray-500">{title}</p>
+    <div className="surface p-4 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md dark:hover:border-blue-900">
+      <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{title}</p>
       <p className={`mt-2 text-xl font-semibold ${variants[variant]}`}>
         {value}
       </p>

@@ -1,5 +1,6 @@
 // hooks/useRider.ts
 import { useDispatch, useSelector } from 'react-redux';
+import { useCallback } from 'react';
 import { RootState } from '../store/store';
 import { 
   registerRider, 
@@ -30,6 +31,9 @@ export const useRider = () => {
     success 
   } = useSelector((state: RootState) => state.riders);
 
+  const fetchAllRiders = useCallback((device: string, params: any) =>
+    dispatch(getAllRiders({ device, params }) as any), [dispatch]);
+
   return {
     // State
     riders,
@@ -54,8 +58,7 @@ export const useRider = () => {
     updateRiderAvailability: (device: string, userId: string, available: boolean) => 
       dispatch(updateRiderAvailability({ device, userId, available }) as any),
     
-    getAllRiders: (device: string, params: any) => 
-      dispatch(getAllRiders({ device, params }) as any),
+    getAllRiders: fetchAllRiders,
     
     getAllVehicles: (device: string, params: any) => 
       dispatch(getAllVehicles({ device, params }) as any),

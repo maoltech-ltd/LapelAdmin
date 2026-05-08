@@ -1,5 +1,5 @@
 // utils/dashboard.utils.ts
-import { DashboardFilter, DashboardStats, RideVolumeData } from '../types/dashboard.types';
+import { DashboardFilter, RideVolumeData } from '../types/dashboard.types';
 
 export const dashboardUtils = {
   // Format date for display
@@ -86,23 +86,5 @@ export const dashboardUtils = {
         }
       }
     }
-  }),
-
-  // Generate mock previous data for demonstration (remove in production)
-  getMockPreviousStats: (currentStats: DashboardStats): DashboardStats => {
-    return {
-      totalUsers: Math.floor(currentStats.totalUsers * 0.85),
-      activeUsers: Math.floor(currentStats.activeUsers * 0.8),
-      totalRiders: Math.floor(currentStats.totalRiders * 0.9),
-      availableRiders: Math.floor(currentStats.availableRiders * 0.85),
-      totalVehicles: Math.floor(currentStats.totalVehicles * 0.88),
-      totalRides: Math.floor(currentStats.totalRides * 0.75),
-      activeRides: Math.floor(currentStats.activeRides * 0.7),
-      completedRides: Math.floor(currentStats.completedRides * 0.8),
-      cancelledRides: Math.floor(currentStats.cancelledRides * 0.9),
-      totalOrders: Math.floor(currentStats.totalOrders * 0.78),
-      paidOrders: Math.floor(currentStats.paidOrders * 0.82),
-      pendingPayments: Math.floor(currentStats.pendingPayments * 0.85),
-    };
-  }
+  })
 };

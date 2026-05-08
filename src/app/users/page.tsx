@@ -1,10 +1,11 @@
 "use client"
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import UsersTable from '@/component/users/UsersTable';
 import UserProfileDrawer from '@/component/users/UserProfileDrawer';
 import Pagination from '@/component/utils/Pagination';
 import TableFilterBar from '@/component/filters/TableFilterBar';
 import { useUser } from '../../../lib/hooks/userUsers';
+import { useDebouncedValue } from '../../../lib/hooks/useDebouncedValue';
 
 const PAGE_SIZE = 10;
 
@@ -12,13 +13,13 @@ export default function UsersPage() {
   const {
     users,
     currentUser,
-    loading,
     searchUsers,
     getUserById,
     clearCurrentUser
   } = useUser();
 
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search);
   const [status, setStatus] = useState('all');
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
@@ -27,13 +28,13 @@ export default function UsersPage() {
   // 🔄 Fetch users whenever filters change
   useEffect(() => {
     searchUsers('admin', {
-      query: search || undefined,
+      query: debouncedSearch || undefined,
       page: page - 1,
       size: PAGE_SIZE,
       sortBy: 'createdAt',
       sortDirection: 'DESC',
     });
-  }, [search, page]);
+  }, [debouncedSearch, page, searchUsers]);
 
   const userList = users?.content ?? [];
   const totalPages = users?.totalPages ?? 1;

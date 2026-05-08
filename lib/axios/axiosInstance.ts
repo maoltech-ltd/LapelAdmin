@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://lapel-admin-1.onrender.com';
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://lapel-admin-1.onrender.com';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
 // Create axios instance with default config
 const axiosInstance = axios.create({

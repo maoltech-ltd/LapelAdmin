@@ -1,6 +1,7 @@
 'use client';
 
 import StatusBadge from '@/component/utils/StatusBadge';
+import { EmptyTableRow, TableShell, ViewButton } from '@/component/utils/DataTable';
 import VerificationStatusBadge from './VerificationStatusBadge';
 import RatingSummary from './RatingSummary';
 import { Rider } from '../../../lib/types/rider.types';
@@ -22,9 +23,9 @@ export default function DriversTable({
   onView: (driver: Rider) => void;
 }) {
   return (
-    <div className="overflow-x-auto rounded-xl border bg-white dark:border-gray-800 dark:bg-gray-900">
+    <TableShell>
       <table className="min-w-full text-sm">
-        <thead className="bg-gray-50 dark:bg-gray-800">
+        <thead className="bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
           <tr>
             <th className="px-4 py-3 text-left">Driver</th>
             <th className="px-4 py-3 text-left">Vehicle</th>
@@ -38,7 +39,7 @@ export default function DriversTable({
           {drivers.map((d) => (
             <tr
               key={d.id}
-              className="border-t hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800/50"
+              className="border-t border-slate-200 transition hover:bg-blue-50/60 dark:border-slate-800 dark:hover:bg-slate-800/70"
             >
               <td className="px-4 py-3">
                 <div className="font-medium">{d.user?.username || d.user?.firstName}</div>
@@ -60,18 +61,14 @@ export default function DriversTable({
               </td>
 
               <td className="px-4 py-3 text-right">
-                <button
-                  onClick={() => onView(d)}
-                  className="text-blue-600 hover:underline dark:text-blue-400"
-                >
-                  View
-                </button>
+                <ViewButton onClick={() => onView(d)} />
               </td>
             </tr>
           ))}
+          {drivers.length === 0 && <EmptyTableRow colSpan={5} message="No drivers found." />}
         </tbody>
       </table>
-    </div>
+    </TableShell>
   );
 }
 

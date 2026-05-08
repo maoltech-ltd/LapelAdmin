@@ -92,7 +92,7 @@ export default function Sidebar() {
   const { role } = useAuth();
 
   return (
-    <aside className="w-64 bg-white dark:bg-gray-900">
+    <aside className="hidden w-64 border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 md:block">
       <nav className="space-y-1 p-3">
         {navItems
           .filter(item => hasAnyPermission(role, item.permissions))

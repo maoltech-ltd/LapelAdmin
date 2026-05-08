@@ -1,19 +1,11 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { roleService } from '../../api/services';
 
-interface Permission {
-  id: string;
-  name: string;
-  description: string;
-  resource: string;
-  action: string;
-}
-
 export interface Role {
   id: string;
   name: string;
   description: string;
-  permissions: Permission[];
+  permissions: string[];
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -22,7 +14,7 @@ export interface Role {
 interface RoleState {
   roles: Role[];
   currentRole: Role | null;
-  permissions: Permission[];
+  permissions: string[];
   loading: boolean;
   error: string | null;
   total: number;
@@ -77,7 +69,7 @@ export const deleteRole = createAsyncThunk(
   }
 );
 
-export const fetchPermissions = createAsyncThunk(
+export const fetchPermissions = createAsyncThunk<any, void>(
   'roles/fetchPermissions',
   async () => {
     const response = await roleService.getPermissions();
@@ -95,13 +87,13 @@ export const updateRolePermissions = createAsyncThunk(
 
 export const manageRolePermission = createAsyncThunk(
   'roles/managePermission',
-  async ({ roleId, permissionId, action }: { 
+  async ({ roleId, permissionId, action }: {
     roleId: string; 
     permissionId: string; 
     action: 'add' | 'remove' 
   }) => {
     const response = await roleService.manageRolePermissions(roleId, { 
-      permissionId, 
+      permission: permissionId,
       action 
     });
     return { roleId, permissionId, action, ...response.data };
@@ -233,14 +225,14 @@ const roleSlice = createSlice({
         if (roleIndex !== -1) {
           if (operation === 'add') {
             // Add permission to role
-            const permission = state.permissions.find(p => p.id === permissionId);
-            if (permission && !state.roles[roleIndex].permissions.some(p => p.id === permissionId)) {
+            const permission = state.permissions.find(p => p === permissionId);
+            if (permission && !state.roles[roleIndex].permissions.includes(permissionId)) {
               state.roles[roleIndex].permissions.push(permission);
             }
           } else if (operation === 'remove') {
             // Remove permission from role
             state.roles[roleIndex].permissions = state.roles[roleIndex].permissions.filter(
-              p => p.id !== permissionId
+              p => p !== permissionId
             );
           }
         }

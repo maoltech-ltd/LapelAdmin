@@ -25,6 +25,53 @@ export interface RideVolumeData {
   count: number;
 }
 
+export type StatsEntityType = 'USER' | 'RIDER' | 'VEHICLE';
+
+export interface StatsMetric {
+  key: string;
+  label: string;
+  value: number;
+  previousValue: number;
+  changePercent: number;
+  trend: 'up' | 'down' | 'flat' | string;
+  unit: 'count' | 'currency' | string;
+}
+
+export interface StatsTrendPoint {
+  period: string;
+  users: number;
+  riders: number;
+  vehicles: number;
+  rides: number;
+  completedRides: number;
+  cancelledRides: number;
+  orders: number;
+  transactions: number;
+  paidOrders: number;
+  pendingPayments: number;
+  revenue: number;
+  transactionVolume: number;
+  seatsBooked: number;
+}
+
+export interface StatsBreakdown {
+  label: string;
+  value: number;
+  percent: number;
+}
+
+export interface AdvancedStats {
+  title: string;
+  entityType?: StatsEntityType;
+  entityId?: string;
+  startDate: string;
+  endDate: string;
+  metrics: StatsMetric[];
+  trends: Record<'daily' | 'weekly' | 'monthly' | 'yearly', StatsTrendPoint[]>;
+  breakdowns: Record<string, StatsBreakdown[]>;
+  averages: Record<string, number>;
+}
+
 export interface ApiResponse<T> {
   code: number;
   message: string;

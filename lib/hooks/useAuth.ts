@@ -1,5 +1,6 @@
 // hooks/useAuth.ts
 import { useDispatch, useSelector } from 'react-redux';
+import { useCallback } from 'react';
 import { RootState } from '../store/store';
 import { 
   login,
@@ -25,6 +26,10 @@ export const useAuth = () => {
     authChecked 
   } = useSelector((state: RootState) => state.auth);
 
+  const loginAdmin = useCallback((device: string, data: any) =>
+    dispatch(login({ device, data }) as any), [dispatch]);
+  const clearAuthError = useCallback(() => dispatch(clearError()), [dispatch]);
+
   return {
     // State
     user,
@@ -37,8 +42,7 @@ export const useAuth = () => {
     authChecked,
     
     // Actions
-    login: (device: string, data: any) => 
-      dispatch(login({ device, data }) as any),
+    login: loginAdmin,
     
     getCurrentAdmin: (device: string) => 
       dispatch(getCurrentAdmin(device) as any),
@@ -53,7 +57,7 @@ export const useAuth = () => {
       dispatch(changePassword({ device, data }) as any),
     
     logout: () => dispatch(logout()),
-    clearError: () => dispatch(clearError()),
+    clearError: clearAuthError,
     clearSuccess: () => dispatch(clearSuccess()),
   };
 };

@@ -22,7 +22,7 @@ export default function PermissionMatrix({
       {permissions.map((perm) => (
         <label
           key={perm}
-          className="flex items-center gap-2 rounded-md border p-2 dark:border-gray-800"
+          className="flex items-center gap-2 rounded-md border border-slate-200 p-2 transition hover:border-blue-300 hover:bg-blue-50/60 dark:border-slate-800 dark:hover:border-blue-900 dark:hover:bg-slate-800"
         >
           <input
             type="checkbox"

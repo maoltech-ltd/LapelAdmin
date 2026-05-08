@@ -44,9 +44,9 @@ export default function RootLayout({
   return (
      <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${manrope.variable} antialiased bg-gray-50 dark:bg-gray-900`}
+        className={`${inter.variable} ${manrope.variable} antialiased bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100`}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <StoreProvider>
             <AppShell>{children}</AppShell>
           </StoreProvider>

@@ -15,7 +15,7 @@ export default function Pagination({
       <button
         disabled={page === 1}
         onClick={() => onPageChange(page - 1)}
-        className="rounded-md border px-3 py-1 text-sm disabled:opacity-50 dark:border-gray-700"
+        className="btn-secondary px-3 py-1 disabled:opacity-50"
       >
         Prev
       </button>
@@ -30,7 +30,7 @@ export default function Pagination({
               className={`rounded-md px-3 py-1 text-sm ${
                 p === page
                   ? 'bg-blue-600 text-white'
-                  : 'border dark:border-gray-700'
+                  : 'border border-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800'
               }`}
             >
               {p}
@@ -42,7 +42,7 @@ export default function Pagination({
       <button
         disabled={page === totalPages}
         onClick={() => onPageChange(page + 1)}
-        className="rounded-md border px-3 py-1 text-sm disabled:opacity-50 dark:border-gray-700"
+        className="btn-secondary px-3 py-1 disabled:opacity-50"
       >
         Next
       </button>

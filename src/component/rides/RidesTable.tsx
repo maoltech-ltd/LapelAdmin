@@ -1,20 +1,22 @@
 'use client';
 
-import { Ride } from '../../../data/ride.mock';
 import StatusBadge from '../utils/StatusBadge';
+import type { Status } from '../utils/StatusBadge';
+import { EmptyTableRow, TableShell, ViewButton } from '../utils/DataTable';
 import SeatsIndicator from './SeatIndicator';
+import { AdminRide, rideAddress } from '../../../lib/types/adminRide.types';
 
 export default function RidesTable({
   rides,
   onView,
 }: {
-  rides: Ride[];
-  onView: (ride: Ride) => void;
+  rides: AdminRide[];
+  onView: (ride: AdminRide) => void;
 }) {
   return (
-    <div className="overflow-x-auto rounded-xl border bg-white dark:border-gray-800 dark:bg-gray-900">
+    <TableShell>
       <table className="min-w-full text-sm">
-        <thead className="bg-gray-50 dark:bg-gray-800">
+        <thead className="bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
           <tr>
             <th className="px-4 py-3 text-left">Route</th>
             <th className="px-4 py-3 text-left">Driver</th>
@@ -26,48 +28,45 @@ export default function RidesTable({
         </thead>
 
         <tbody>
-          {rides.map((r: Ride) => (
+          {rides.map((ride) => (
             <tr
-              key={r.id}
-              className="border-t hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800/50"
+              key={ride.id}
+              className="border-t border-slate-200 transition hover:bg-blue-50/60 dark:border-slate-800 dark:hover:bg-slate-800/70"
             >
               <td className="px-4 py-3">
-                <div className="font-medium">{r.origin} → {r.destination}</div>
-                {
-                r.waypoints?.length || 0 > 0 && (
-                  <div className="text-xs text-gray-500">
-                    via {r.waypoints?.join(', ') || ''}
-                  </div>
-                )}
+                <div className="font-medium text-slate-900 dark:text-slate-100">
+                  {rideAddress(ride.origin)} to {rideAddress(ride.destination)}
+                </div>
+                <div className="text-xs text-slate-500 dark:text-slate-400">
+                  Vehicle: {ride.vehicleId || 'Unassigned'}
+                </div>
               </td>
-
-              <td className="px-4 py-3">{r.driverName}</td>
-
+              <td className="px-4 py-3">{ride.riderId || 'Unassigned'}</td>
               <td className="px-4 py-3">
-                <div>{r.scheduleType}</div>
-                <div className="text-xs text-gray-500">{r.date}</div>
+                <div>{ride.recurring ? 'Recurring' : 'Single trip'}</div>
+                <div className="text-xs text-slate-500 dark:text-slate-400">
+                  {ride.departureTime ? new Date(ride.departureTime).toLocaleString() : 'Not scheduled'}
+                </div>
               </td>
-
               <td className="px-4 py-3">
-                <SeatsIndicator total={r.totalSeats} booked={r.bookedSeats} />
+                <SeatsIndicator
+                  total={(ride.seatsAvailable || 0) + (ride.seatsBooked || 0)}
+                  booked={ride.seatsBooked || 0}
+                />
               </td>
-
               <td className="px-4 py-3">
-                <StatusBadge status={r.status} />
+                <StatusBadge status={(ride.status || 'pending').toLowerCase() as Status} />
               </td>
-
               <td className="px-4 py-3 text-right">
-                <button
-                  onClick={() => onView(r)}
-                  className="text-blue-600 hover:underline dark:text-blue-400"
-                >
-                  View
-                </button>
+                <ViewButton onClick={() => onView(ride)} />
               </td>
             </tr>
           ))}
+          {rides.length === 0 && (
+            <EmptyTableRow colSpan={6} message="No rides found." />
+          )}
         </tbody>
       </table>
-    </div>
+    </TableShell>
   );
 }

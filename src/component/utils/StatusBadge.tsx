@@ -15,6 +15,7 @@ export type Status =
 
   // Rides
   | 'scheduled'
+  | 'available'
   | 'ongoing'
   | 'completed'
   | 'cancelled'
@@ -26,6 +27,7 @@ export type Status =
   | 'paid'
   | 'processing'
   | 'reversed'
+  | 'refunded'
   
   | 'flagged';
 
@@ -45,6 +47,7 @@ const STATUS_STYLES: Record<Status, string> = {
 
   // Rides
   scheduled: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+  available: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
   ongoing: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
   completed: 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
   cancelled: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
@@ -56,6 +59,7 @@ const STATUS_STYLES: Record<Status, string> = {
   paid: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   processing: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
   reversed: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+  refunded: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
 
   flagged: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
 };

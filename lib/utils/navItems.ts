@@ -5,6 +5,7 @@ import {
   Route,
   Settings,
   ShieldCheck,
+  ChartNoAxesCombined,
   Menu,
   Currency,
   X,
@@ -15,6 +16,12 @@ const navItems = [
     label: 'Dashboard',
     href: '/dashboard',
     icon: LayoutDashboard,
+    permissions: ['VIEW_DASHBOARD'],
+  },
+  {
+    label: 'Stats',
+    href: '/stats',
+    icon: ChartNoAxesCombined,
     permissions: ['VIEW_DASHBOARD'],
   },
   {

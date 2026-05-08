@@ -8,6 +8,7 @@ import riderReducer from './slices/riderSlice';
 import adminReducer from './slices/adminSlice';
 import dashboardReducer from './slices/dashboardSlice';
 import transactionReducer from './slices/transactionSlice';
+import roleReducer from './slices/roleSlice';
 
 export const store = configureStore({
   reducer: {
@@ -19,7 +20,8 @@ export const store = configureStore({
     riders: riderReducer,
     admins: adminReducer,
     dashboard: dashboardReducer,
-    transactions: transactionReducer
+    transactions: transactionReducer,
+    roles: roleReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -8,10 +8,10 @@ export default function SettingsSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-xl border bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-      <h2 className="text-lg font-semibold">{title}</h2>
+    <section className="surface p-6">
+      <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</h2>
       {description && (
-        <p className="text-sm text-gray-500">{description}</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>
       )}
       <div className="mt-4 space-y-4">{children}</div>
     </section>

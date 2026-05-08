@@ -5,7 +5,7 @@ import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 
 export default function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -17,16 +17,25 @@ export default function ThemeToggle() {
   }, []);
   if (!mounted) return null;
 
+  const isDark = resolvedTheme === 'dark';
+
   return (
     <button
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800"
-      aria-label="Toggle theme"
+      onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+      aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+      title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
     >
-      {theme === 'dark' ? (
-        <Sun className="h-5 w-5 text-yellow-400" />
+      {isDark ? (
+        <>
+          <Sun className="h-4 w-4 text-yellow-300" />
+          Light
+        </>
       ) : (
-        <Moon className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+        <>
+          <Moon className="h-4 w-4 text-slate-700" />
+          Dark
+        </>
       )}
     </button>
   );

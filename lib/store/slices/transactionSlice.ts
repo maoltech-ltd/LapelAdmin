@@ -35,6 +35,20 @@ export const fetchTransactionByRef = createAsyncThunk(
   }
 );
 
+export const retryTransaction = createAsyncThunk(
+  'transactions/retry',
+  async ({ device, reference }: any) => {
+    return await transactionService.retryTransaction(device, reference);
+  }
+);
+
+export const flagTransaction = createAsyncThunk(
+  'transactions/flag',
+  async ({ device, reference }: any) => {
+    return await transactionService.flagTransaction(device, reference);
+  }
+);
+
 const transactionSlice = createSlice({
   name: 'transactions',
   initialState: initialState,
@@ -74,6 +88,20 @@ const transactionSlice = createSlice({
       .addCase(fetchTransactionByRef.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error?.message;
+      })
+      .addCase(retryTransaction.fulfilled, (state, action) => {
+        if (!state.transactions) return;
+        const index = state.transactions.content.findIndex(
+          (tx) => tx.reference === action.payload.data.reference
+        );
+        if (index !== -1) state.transactions.content[index] = action.payload.data;
+      })
+      .addCase(flagTransaction.fulfilled, (state, action) => {
+        if (!state.transactions) return;
+        const index = state.transactions.content.findIndex(
+          (tx) => tx.reference === action.payload.data.reference
+        );
+        if (index !== -1) state.transactions.content[index] = action.payload.data;
       });
 
   }

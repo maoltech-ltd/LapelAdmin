@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import EntityStatsSection from '@/component/stats/EntityStatsSection';
+import { DetailGrid, DetailSection, StatSummaryGrid } from '@/component/utils/DetailBlocks';
+import DetailDrawer from '@/component/utils/DetailDrawer';
 import { Rider } from '../../../lib/types/rider.types';
 import { riderService } from '../../../lib/api/services/riderService';
 import DocumentViewer from './DocumentViewer';
@@ -44,7 +47,6 @@ export default function DriverProfileDrawer({
   if (!open || !driver) return null;
 
   async function review(status: 'ACCEPTED' | 'DECLINED') {
-    if (!driver) return;
     setBusy(true);
     setError(null);
     try {
@@ -58,15 +60,9 @@ export default function DriverProfileDrawer({
           : {}),
       };
       const tasks: Promise<unknown>[] = [];
-      if (driver.id) {
-        tasks.push(riderService.reviewRiderDocuments(DEVICE, driver.id, payload));
-      }
-      if (driver.vehicle?.id) {
-        tasks.push(riderService.reviewVehicleDocuments(DEVICE, driver.vehicle.id, payload));
-      }
-      if (tasks.length === 0) {
-        throw new Error('Missing rider or vehicle id for review.');
-      }
+      if (driver?.id) tasks.push(riderService.reviewRiderDocuments(DEVICE, driver.id, payload));
+      if (driver?.vehicle?.id) tasks.push(riderService.reviewVehicleDocuments(DEVICE, driver.vehicle.id, payload));
+      if (tasks.length === 0) throw new Error('Missing rider or vehicle id for review.');
       await Promise.all(tasks);
       onReviewed?.();
       onClose();
@@ -77,61 +73,111 @@ export default function DriverProfileDrawer({
     }
   }
 
+  const name = driver.user?.username || [driver.user?.firstName, driver.user?.lastName].filter(Boolean).join(' ') || 'Driver';
   const canReview = Boolean(driver.id || driver.vehicle?.id);
+  const vehicleName = [driver.vehicle?.year, driver.vehicle?.make, driver.vehicle?.model].filter(Boolean).join(' ');
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/40">
-      <div className="w-full max-w-xl overflow-y-auto bg-white p-6 dark:bg-gray-900">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">
-            {driver.user?.username || driver.user?.firstName || 'Driver'}
-          </h2>
-          <button onClick={onClose} aria-label="Close">x</button>
+    <DetailDrawer
+      open={open}
+      onClose={onClose}
+      widthClassName="max-w-6xl"
+      title={name}
+      subtitle={driver.user?.email || driver.user?.phoneNumber || driver.id}
+      badge={<VerificationStatusBadge status={normalizeStatus(driver.documentReviewStatus)} />}
+      footer={
+        <div className="flex flex-wrap gap-2">
+          <button disabled={busy || !canReview} onClick={() => review('ACCEPTED')} className="btn-primary bg-emerald-600 hover:bg-emerald-700">
+            Approve
+          </button>
+          <button
+            disabled={busy || !canReview}
+            onClick={() => review('DECLINED')}
+            className="rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50"
+          >
+            Reject
+          </button>
+          <button className="btn-secondary">Suspend</button>
+        </div>
+      }
+    >
+      <div className="space-y-5">
+        <StatSummaryGrid
+          stats={[
+            { label: 'Availability', value: driver.available ? 'Available' : 'Offline', hint: 'Driver status' },
+            { label: 'Rating', value: driver.rating?.toFixed?.(1) ?? 'N/A', hint: 'Average customer rating' },
+            { label: 'Vehicle seats', value: driver.vehicle?.seats ?? 'N/A', hint: vehicleName || 'Assigned vehicle' },
+            { label: 'Plate', value: driver.vehicle?.licensePlateNumber || 'N/A', hint: driver.vehicle?.color || 'Vehicle color' },
+          ]}
+        />
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <DetailSection title="Personal info">
+            <DetailGrid
+              items={[
+                { label: 'Name', value: name },
+                { label: 'Email', value: driver.user?.email },
+                { label: 'Phone', value: driver.user?.phoneNumber },
+                { label: 'Driver license', value: driver.driverLicenseNumber },
+              ]}
+            />
+          </DetailSection>
+
+          <DetailSection title="Vehicle info">
+            <DetailGrid
+              items={[
+                { label: 'Vehicle', value: vehicleName },
+                { label: 'Plate', value: driver.vehicle?.licensePlateNumber },
+                { label: 'Color', value: driver.vehicle?.color },
+                { label: 'Vehicle license', value: driver.vehicle?.vehicleLicenseNumber },
+              ]}
+            />
+          </DetailSection>
         </div>
 
-        <div className="mt-4 space-y-4 text-sm">
-          <section>
-            <h3 className="font-medium">Personal Info</h3>
-            <p>{driver.user?.email || driver.user?.phoneNumber || 'N/A'}</p>
-            <p>{driver.user?.phoneNumber || 'N/A'}</p>
-          </section>
-
-          <section>
-            <h3 className="font-medium">Vehicle Info</h3>
-            <p>{driver.vehicle?.make} {driver.vehicle?.model}</p>
-            <p>{driver.vehicle?.licensePlateNumber}</p>
-            <p>{driver.vehicle?.color}</p>
-          </section>
-
-          <section className="grid grid-cols-2 gap-4">
+        <DetailSection title="Documents">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <div className="space-y-2">
               <DocumentViewer label="Driver License" url={driver.driverLicense} />
               <VerificationStatusBadge status={normalizeStatus(driver.documentReviewStatus)} />
-              {driver.documentReviewReason && (
-                <p className="text-xs text-red-600">{driver.documentReviewReason}</p>
-              )}
+              {driver.documentReviewReason && <p className="text-xs text-red-600">{driver.documentReviewReason}</p>}
             </div>
             <div className="space-y-2">
               <DocumentViewer label="Vehicle Document" url={driver.vehicle?.vehicleLicense} />
               <VerificationStatusBadge status={normalizeStatus(driver.vehicle?.documentReviewStatus)} />
-              {driver.vehicle?.documentReviewReason && (
-                <p className="text-xs text-red-600">{driver.vehicle.documentReviewReason}</p>
-              )}
+              {driver.vehicle?.documentReviewReason && <p className="text-xs text-red-600">{driver.vehicle.documentReviewReason}</p>}
             </div>
-          </section>
+          </div>
+        </DetailSection>
 
-          <section>
-            <h3 className="font-medium">Performance</h3>
-            <RatingSummary rating={driver.rating} trips={20} />
-            <p className="text-xs text-gray-500">Earnings: NGN {100000000}</p>
-          </section>
+        <DetailSection title="Performance">
+          <RatingSummary rating={driver.rating} trips={20} />
+        </DetailSection>
 
-          <section className="space-y-2 rounded-lg border p-3 dark:border-gray-800">
-            <h3 className="font-medium">Decline template</h3>
+        {driver.id && (
+          <EntityStatsSection
+            entityType="RIDER"
+            entityId={driver.id}
+            title="Rider stats and transaction usage"
+            exportFilename="rider-stats.csv"
+          />
+        )}
+
+        {driver.vehicle?.id && (
+          <EntityStatsSection
+            entityType="VEHICLE"
+            entityId={driver.vehicle.id}
+            title="Vehicle stats and ride usage"
+            exportFilename="vehicle-stats.csv"
+          />
+        )}
+
+        <DetailSection title="Decline template">
+          <div className="space-y-2">
             <select
               value={reasonCode}
               onChange={(event) => setReasonCode(event.target.value)}
-              className="w-full rounded-md border bg-transparent px-3 py-2 text-sm dark:border-gray-700"
+              className="input w-full"
             >
               {declineReasons.map((reason) => (
                 <option key={reason.code} value={reason.code}>
@@ -143,33 +189,13 @@ export default function DriverProfileDrawer({
               value={customReason}
               onChange={(event) => setCustomReason(event.target.value)}
               placeholder="Optional extra note"
-              className="min-h-20 w-full rounded-md border bg-transparent px-3 py-2 text-sm dark:border-gray-700"
+              className="input min-h-24 w-full"
             />
             {error && <p className="text-xs text-red-600">{error}</p>}
-          </section>
-
-          <section className="flex flex-wrap gap-2 pt-4">
-            <button
-              disabled={busy || !canReview}
-              onClick={() => review('ACCEPTED')}
-              className="rounded-md bg-green-600 px-3 py-1 text-white disabled:opacity-50"
-            >
-              Approve
-            </button>
-            <button
-              disabled={busy || !canReview}
-              onClick={() => review('DECLINED')}
-              className="rounded-md bg-red-600 px-3 py-1 text-white disabled:opacity-50"
-            >
-              Reject
-            </button>
-            <button className="rounded-md border px-3 py-1 dark:border-gray-700">
-              Suspend
-            </button>
-          </section>
-        </div>
+          </div>
+        </DetailSection>
       </div>
-    </div>
+    </DetailDrawer>
   );
 }
 
