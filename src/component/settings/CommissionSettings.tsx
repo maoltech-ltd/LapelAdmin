@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import SettingsSection from './SettingsSection';
+import SettingField from './SettingField';
 import { PlatformSettings } from '../../../lib/api/services/settingsService';
 
 export default function CommissionSettings({
@@ -29,57 +30,52 @@ export default function CommissionSettings({
 
   return (
     <SettingsSection title="Pricing & Commission" description="Control platform earnings and ride limits">
-      <div className="flex items-center justify-between gap-4">
-        <label className="text-sm font-medium">Commission (%)</label>
+      <SettingField label="Commission (%)" description="Percentage retained by the platform from completed rides.">
         <input
           type="number"
-          className="input w-28"
+          className="input w-full"
           value={commission}
           onChange={(event) => setCommission(Number(event.target.value))}
         />
-      </div>
+      </SettingField>
 
-      <div className="flex items-center justify-between gap-4">
-        <label className="text-sm font-medium">Max seats per ride</label>
+      <SettingField label="Max seats per ride" description="Upper passenger seat limit for driver offers.">
         <input
           type="number"
-          className="input w-28"
+          className="input w-full"
           value={seatLimit}
           onChange={(event) => setSeatLimit(Number(event.target.value))}
         />
-      </div>
+      </SettingField>
 
-      <div className="flex items-center justify-between gap-4">
-        <label className="text-sm font-medium">Referral reward</label>
+      <SettingField label="Referral reward" description="Reward type issued when referral rules are met.">
         <select
-          className="input w-36"
+          className="input w-full"
           value={rewardType}
           onChange={(event) => setRewardType(event.target.value as PlatformSettings['referralRewardType'])}
         >
           <option value="WALLET">Wallet funding</option>
           <option value="FREE_RIDE">Free ride</option>
         </select>
-      </div>
+      </SettingField>
 
-      <div className="flex items-center justify-between gap-4">
-        <label className="text-sm font-medium">Referral wallet amount</label>
+      <SettingField label="Referral wallet amount" description="Wallet credit when wallet reward is selected.">
         <input
           type="number"
-          className="input w-28"
+          className="input w-full"
           value={rewardAmount}
           onChange={(event) => setRewardAmount(Number(event.target.value))}
         />
-      </div>
+      </SettingField>
 
-      <div className="flex items-center justify-between gap-4">
-        <label className="text-sm font-medium">Referral free rides</label>
+      <SettingField label="Referral free rides" description="Free ride count when free ride reward is selected.">
         <input
           type="number"
-          className="input w-28"
+          className="input w-full"
           value={freeRideCount}
           onChange={(event) => setFreeRideCount(Number(event.target.value))}
         />
-      </div>
+      </SettingField>
 
       <button
         className="btn-primary w-fit"

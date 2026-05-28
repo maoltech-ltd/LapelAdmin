@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import CommissionSettings from '@/component/settings/CommissionSettings';
 import CouponSettings from '@/component/settings/CouponSettings';
 import FeatureToggleSettings from '@/component/settings/FeatureToggleSettings';
+import TransactionNotificationSettings from '@/component/settings/TransactionNotificationSettings';
 import { PlatformSettings, settingsService } from '../../../lib/api/services/settingsService';
 
 const DEVICE = 'web';
@@ -14,6 +15,12 @@ const fallbackSettings: PlatformSettings = {
   scheduledRidesEnabled: false,
   driverAutoApprovalEnabled: false,
   notificationsEnabled: false,
+  transactionNotificationEmailCharge: 0,
+  transactionNotificationSmsCharge: 0,
+  transactionNotificationPushCharge: 0,
+  smsTransactionTemplate: 'wallet-transaction',
+  emailTransactionTemplate: 'wallet-transaction',
+  pushTransactionTemplate: 'wallet-transaction',
   referralEnabled: false,
   referralRewardType: 'WALLET',
   referralRewardAmount: 0,
@@ -64,6 +71,7 @@ export default function SettingsPage() {
 
       <CommissionSettings settings={settings} saving={saving} onSave={save} />
       <FeatureToggleSettings settings={settings} saving={saving} onSave={save} />
+      <TransactionNotificationSettings settings={settings} saving={saving} onSave={save} />
       <CouponSettings device={DEVICE} />
     </div>
   );

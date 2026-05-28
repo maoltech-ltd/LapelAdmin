@@ -7,6 +7,12 @@ export interface PlatformSettings {
   scheduledRidesEnabled: boolean;
   driverAutoApprovalEnabled: boolean;
   notificationsEnabled: boolean;
+  transactionNotificationEmailCharge: number;
+  transactionNotificationSmsCharge: number;
+  transactionNotificationPushCharge: number;
+  smsTransactionTemplate: string;
+  emailTransactionTemplate: string;
+  pushTransactionTemplate: string;
   referralEnabled: boolean;
   referralRewardType: 'WALLET' | 'FREE_RIDE';
   referralRewardAmount: number;

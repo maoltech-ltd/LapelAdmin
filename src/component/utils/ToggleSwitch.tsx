@@ -7,6 +7,7 @@ interface ToggleSwitchProps {
   checked?: boolean;
   onChange?: (value: boolean) => void;
   disabled?: boolean;
+  hideLabel?: boolean;
 }
 
 export default function ToggleSwitch({
@@ -14,6 +15,7 @@ export default function ToggleSwitch({
   checked,
   onChange,
   disabled = false,
+  hideLabel = false,
 }: ToggleSwitchProps) {
   const [internal, setInternal] = useState(false);
 
@@ -31,9 +33,11 @@ export default function ToggleSwitch({
 
   return (
     <div className="flex items-center justify-between gap-4">
-      <span className="text-sm text-gray-700 dark:text-gray-300">
-        {label}
-      </span>
+      {!hideLabel && (
+        <span className="text-sm text-gray-700 dark:text-gray-300">
+          {label}
+        </span>
+      )}
 
       <button
         type="button"
