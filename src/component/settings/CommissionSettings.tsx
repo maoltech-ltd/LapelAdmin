@@ -19,6 +19,13 @@ export default function CommissionSettings({
   const [rewardType, setRewardType] = useState(settings.referralRewardType);
   const [rewardAmount, setRewardAmount] = useState(settings.referralRewardAmount);
   const [freeRideCount, setFreeRideCount] = useState(settings.referralFreeRideCount);
+  const [iosWalletFundingCharge, setIosWalletFundingCharge] = useState(settings.iosWalletFundingCharge ?? 0);
+  const [androidWalletFundingCharge, setAndroidWalletFundingCharge] = useState(settings.androidWalletFundingCharge ?? 0);
+  const [iosWithdrawalCharge, setIosWithdrawalCharge] = useState(settings.iosWithdrawalCharge ?? 0);
+  const [androidWithdrawalCharge, setAndroidWithdrawalCharge] = useState(settings.androidWithdrawalCharge ?? 0);
+  const [rideChargeType, setRideChargeType] = useState(settings.rideChargeType ?? 'FIXED');
+  const [iosRideCharge, setIosRideCharge] = useState(settings.iosRideCharge ?? 0);
+  const [androidRideCharge, setAndroidRideCharge] = useState(settings.androidRideCharge ?? 0);
 
   useEffect(() => {
     setCommission(settings.commissionPercentage);
@@ -26,6 +33,13 @@ export default function CommissionSettings({
     setRewardType(settings.referralRewardType);
     setRewardAmount(settings.referralRewardAmount);
     setFreeRideCount(settings.referralFreeRideCount);
+    setIosWalletFundingCharge(settings.iosWalletFundingCharge ?? 0);
+    setAndroidWalletFundingCharge(settings.androidWalletFundingCharge ?? 0);
+    setIosWithdrawalCharge(settings.iosWithdrawalCharge ?? 0);
+    setAndroidWithdrawalCharge(settings.androidWithdrawalCharge ?? 0);
+    setRideChargeType(settings.rideChargeType ?? 'FIXED');
+    setIosRideCharge(settings.iosRideCharge ?? 0);
+    setAndroidRideCharge(settings.androidRideCharge ?? 0);
   }, [settings]);
 
   return (
@@ -47,6 +61,79 @@ export default function CommissionSettings({
           onChange={(event) => setSeatLimit(Number(event.target.value))}
         />
       </SettingField>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <SettingField label="iOS wallet funding charge" description="Extra amount added when iOS users fund wallet.">
+          <input
+            type="number"
+            min={0}
+            className="input w-full"
+            value={iosWalletFundingCharge}
+            onChange={(event) => setIosWalletFundingCharge(Number(event.target.value))}
+          />
+        </SettingField>
+
+        <SettingField label="Android wallet funding charge" description="Extra amount added when Android users fund wallet.">
+          <input
+            type="number"
+            min={0}
+            className="input w-full"
+            value={androidWalletFundingCharge}
+            onChange={(event) => setAndroidWalletFundingCharge(Number(event.target.value))}
+          />
+        </SettingField>
+
+        <SettingField label="iOS withdrawal charge" description="Extra amount debited when iOS users withdraw.">
+          <input
+            type="number"
+            min={0}
+            className="input w-full"
+            value={iosWithdrawalCharge}
+            onChange={(event) => setIosWithdrawalCharge(Number(event.target.value))}
+          />
+        </SettingField>
+
+        <SettingField label="Android withdrawal charge" description="Extra amount debited when Android users withdraw.">
+          <input
+            type="number"
+            min={0}
+            className="input w-full"
+            value={androidWithdrawalCharge}
+            onChange={(event) => setAndroidWithdrawalCharge(Number(event.target.value))}
+          />
+        </SettingField>
+
+        <SettingField label="Ride platform charge type" description="Apply ride booking platform charges as a fixed amount or percentage of fare.">
+          <select
+            className="input w-full"
+            value={rideChargeType}
+            onChange={(event) => setRideChargeType(event.target.value as PlatformSettings['rideChargeType'])}
+          >
+            <option value="FIXED">Fixed amount</option>
+            <option value="PERCENTAGE">Percentage</option>
+          </select>
+        </SettingField>
+
+        <SettingField label="iOS ride platform charge" description={rideChargeType === 'PERCENTAGE' ? 'Percentage added to iOS ride bookings.' : 'Fixed amount added to iOS ride bookings.'}>
+          <input
+            type="number"
+            min={0}
+            className="input w-full"
+            value={iosRideCharge}
+            onChange={(event) => setIosRideCharge(Number(event.target.value))}
+          />
+        </SettingField>
+
+        <SettingField label="Android ride platform charge" description={rideChargeType === 'PERCENTAGE' ? 'Percentage added to Android ride bookings.' : 'Fixed amount added to Android ride bookings.'}>
+          <input
+            type="number"
+            min={0}
+            className="input w-full"
+            value={androidRideCharge}
+            onChange={(event) => setAndroidRideCharge(Number(event.target.value))}
+          />
+        </SettingField>
+      </div>
 
       <SettingField label="Referral reward" description="Reward type issued when referral rules are met.">
         <select
@@ -88,6 +175,13 @@ export default function CommissionSettings({
             referralRewardType: rewardType,
             referralRewardAmount: rewardAmount,
             referralFreeRideCount: freeRideCount,
+            iosWalletFundingCharge,
+            androidWalletFundingCharge,
+            iosWithdrawalCharge,
+            androidWithdrawalCharge,
+            rideChargeType,
+            iosRideCharge,
+            androidRideCharge,
           })
         }
         title="Save pricing settings"

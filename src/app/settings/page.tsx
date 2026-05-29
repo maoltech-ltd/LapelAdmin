@@ -26,6 +26,13 @@ const fallbackSettings: PlatformSettings = {
   referralRewardAmount: 0,
   referralFreeRideCount: 1,
   firstRideFreeEnabled: false,
+  iosWalletFundingCharge: 0,
+  androidWalletFundingCharge: 0,
+  iosWithdrawalCharge: 0,
+  androidWithdrawalCharge: 0,
+  rideChargeType: 'FIXED',
+  iosRideCharge: 0,
+  androidRideCharge: 0,
 };
 
 export default function SettingsPage() {

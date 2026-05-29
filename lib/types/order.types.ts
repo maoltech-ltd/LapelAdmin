@@ -30,6 +30,13 @@ export interface OrderDto {
   passengerId: string;
   driverId: string;
   fare: number;
+  grossFare: number;
+  discountAmount: number;
+  deviceChargeAmount: number;
+  platformChargeType: string;
+  platformChargeRate: number;
+  commissionAmount: number;
+  driverEarning: number;
   seatsBooked: number;
   status: OrderStatus;
   payment: PaymentStatus;

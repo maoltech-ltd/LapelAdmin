@@ -18,6 +18,13 @@ export interface PlatformSettings {
   referralRewardAmount: number;
   referralFreeRideCount: number;
   firstRideFreeEnabled: boolean;
+  iosWalletFundingCharge: number;
+  androidWalletFundingCharge: number;
+  iosWithdrawalCharge: number;
+  androidWithdrawalCharge: number;
+  rideChargeType: 'FIXED' | 'PERCENTAGE';
+  iosRideCharge: number;
+  androidRideCharge: number;
 }
 
 export interface Coupon {
