@@ -27,6 +27,12 @@ export default function TransactionNotificationSettings({
   const [smsTemplate, setSmsTemplate] = useState(settings.smsTransactionTemplate);
   const [emailTemplate, setEmailTemplate] = useState(settings.emailTransactionTemplate);
   const [pushTemplate, setPushTemplate] = useState(settings.pushTransactionTemplate);
+  const [rideSmsCharge, setRideSmsCharge] = useState(settings.rideNotificationSmsCharge);
+  const [rideEmailCharge, setRideEmailCharge] = useState(settings.rideNotificationEmailCharge);
+  const [ridePushCharge, setRidePushCharge] = useState(settings.rideNotificationPushCharge);
+  const [rideSmsTemplate, setRideSmsTemplate] = useState(settings.smsRideTemplate);
+  const [rideEmailTemplate, setRideEmailTemplate] = useState(settings.emailRideTemplate);
+  const [ridePushTemplate, setRidePushTemplate] = useState(settings.pushRideTemplate);
 
   useEffect(() => {
     setSmsCharge(settings.transactionNotificationSmsCharge ?? 0);
@@ -35,6 +41,12 @@ export default function TransactionNotificationSettings({
     setSmsTemplate(settings.smsTransactionTemplate || 'wallet-transaction');
     setEmailTemplate(settings.emailTransactionTemplate || 'wallet-transaction');
     setPushTemplate(settings.pushTransactionTemplate || 'wallet-transaction');
+    setRideSmsCharge(settings.rideNotificationSmsCharge ?? 0);
+    setRideEmailCharge(settings.rideNotificationEmailCharge ?? 0);
+    setRidePushCharge(settings.rideNotificationPushCharge ?? 0);
+    setRideSmsTemplate(settings.smsRideTemplate || 'ride-notification');
+    setRideEmailTemplate(settings.emailRideTemplate || 'ride-notification');
+    setRidePushTemplate(settings.pushRideTemplate || 'ride-notification');
   }, [settings]);
 
   const save = () => {
@@ -46,14 +58,24 @@ export default function TransactionNotificationSettings({
       smsTransactionTemplate: smsTemplate,
       emailTransactionTemplate: emailTemplate,
       pushTransactionTemplate: pushTemplate,
+      rideNotificationSmsCharge: rideSmsCharge,
+      rideNotificationEmailCharge: rideEmailCharge,
+      rideNotificationPushCharge: ridePushCharge,
+      smsRideTemplate: rideSmsTemplate,
+      emailRideTemplate: rideEmailTemplate,
+      pushRideTemplate: ridePushTemplate,
     });
   };
 
   return (
     <SettingsSection
-      title="Transaction Notifications"
-      description="Manage customer transaction alert charges and message templates"
+      title="Notification Charges"
+      description="Manage transaction and ride notification charges and message templates"
     >
+      <div className="space-y-2">
+        <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Transaction alerts</h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Applied to wallet funding, withdrawals, and payment transaction alerts.</p>
+      </div>
       <div className="grid gap-4 lg:grid-cols-3">
         <ChannelSettings
           title="SMS"
@@ -75,6 +97,34 @@ export default function TransactionNotificationSettings({
           template={pushTemplate}
           onChargeChange={setPushCharge}
           onTemplateChange={setPushTemplate}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Ride alerts</h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Applied when a rider or customer chooses Email, SMS, or Push for ride updates.</p>
+      </div>
+      <div className="grid gap-4 lg:grid-cols-3">
+        <ChannelSettings
+          title="SMS"
+          charge={rideSmsCharge}
+          template={rideSmsTemplate}
+          onChargeChange={setRideSmsCharge}
+          onTemplateChange={setRideSmsTemplate}
+        />
+        <ChannelSettings
+          title="Email"
+          charge={rideEmailCharge}
+          template={rideEmailTemplate}
+          onChargeChange={setRideEmailCharge}
+          onTemplateChange={setRideEmailTemplate}
+        />
+        <ChannelSettings
+          title="Push"
+          charge={ridePushCharge}
+          template={ridePushTemplate}
+          onChargeChange={setRidePushCharge}
+          onTemplateChange={setRidePushTemplate}
         />
       </div>
 

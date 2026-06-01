@@ -10,9 +10,15 @@ export interface PlatformSettings {
   transactionNotificationEmailCharge: number;
   transactionNotificationSmsCharge: number;
   transactionNotificationPushCharge: number;
+  rideNotificationEmailCharge: number;
+  rideNotificationSmsCharge: number;
+  rideNotificationPushCharge: number;
   smsTransactionTemplate: string;
   emailTransactionTemplate: string;
   pushTransactionTemplate: string;
+  smsRideTemplate: string;
+  emailRideTemplate: string;
+  pushRideTemplate: string;
   referralEnabled: boolean;
   referralRewardType: 'WALLET' | 'FREE_RIDE';
   referralRewardAmount: number;
