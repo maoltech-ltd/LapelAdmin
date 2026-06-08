@@ -5,6 +5,7 @@ import {
   UserSearchParams, 
   UpdateUserData, 
   ChangePasswordData,
+  UserReport,
   ApiResponse,
   PaginatedResponse
 } from '../../types/user.types';
@@ -55,6 +56,25 @@ export const userService = {
       `/api/v1/${device}/users/delete`,
       getHeaders(userId)
     );
+    return response.data;
+  },
+
+  activateUser: async (device: string, userId: string): Promise<ApiResponse<User>> => {
+    const response = await axiosInstance.put(`/api/v1/${device}/users/${userId}/activate`);
+    return response.data;
+  },
+
+  deactivateUser: async (device: string, userId: string, reason?: string): Promise<ApiResponse<User>> => {
+    const response = await axiosInstance.put(
+      `/api/v1/${device}/users/${userId}/deactivate`,
+      null,
+      { params: reason ? { reason } : undefined }
+    );
+    return response.data;
+  },
+
+  getUserReports: async (device: string, userId: string): Promise<ApiResponse<UserReport[]>> => {
+    const response = await axiosInstance.get(`/api/v1/${device}/reports/users/${userId}`);
     return response.data;
   },
 

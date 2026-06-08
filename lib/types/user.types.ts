@@ -10,6 +10,10 @@ export interface User {
   sex: 'MALE' | 'FEMALE' | 'OTHER';
   profilePicture: string;
   active: boolean;
+  reportCount?: number;
+  reportPoints?: number;
+  blockReason?: string;
+  blockedAt?: string;
   isRider: boolean;
   isAdmin: boolean;
   role: string;
@@ -76,4 +80,19 @@ export interface PaginatedResponse<T> {
   first: boolean;
   numberOfElements: number;
   empty: boolean;
+}
+
+export interface UserReport {
+  id: string;
+  reportedUserId: string;
+  reporterUserId: string;
+  reason: string;
+  reasonLabel: string;
+  details?: string;
+  rideId?: string;
+  instantBlock: boolean;
+  blockedUser: boolean;
+  resultingReportCount?: number;
+  resultingReportPoints?: number;
+  createdAt?: string;
 }

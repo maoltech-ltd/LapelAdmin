@@ -19,6 +19,7 @@ export default function UsersTable({
             <th className="px-4 py-3 text-left">Name</th>
             <th className="px-4 py-3 text-left">Contact</th>
             <th className="px-4 py-3 text-left">Status</th>
+            <th className="px-4 py-3 text-left">Reports</th>
             <th className="px-4 py-3 text-left">Rides</th>
             <th className="px-4 py-3"></th>
           </tr>
@@ -40,13 +41,14 @@ export default function UsersTable({
               <td className="px-4 py-3">
                 <StatusBadge status={user.active ? 'active' : 'inactive'} />
               </td>
+              <td className="px-4 py-3">{user.reportCount ?? 0}</td>
               <td className="px-4 py-3">0</td>
               <td className="px-4 py-3 text-right">
                 <ViewButton onClick={() => onViewUser(user)} />
               </td>
             </tr>
           ))}
-          {users.length === 0 && <EmptyTableRow colSpan={5} message="No users found." />}
+          {users.length === 0 && <EmptyTableRow colSpan={6} message="No users found." />}
         </tbody>
       </table>
     </TableShell>
