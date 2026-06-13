@@ -24,6 +24,11 @@ export default function RideDetailsDrawer({
 
   const seatsTotal = (ride.seatsAvailable || 0) + (ride.seatsBooked || 0);
   const bookedPercent = seatsTotal ? Math.round(((ride.seatsBooked || 0) / seatsTotal) * 100) : 0;
+  const recurring = ride.recurring || ride.isRecurring;
+  const parentRideWarning = recurring
+    ? 'Recurring parent rides stay available while individual occurrences move through ongoing and completed states.'
+    : null;
+  const departure = ride.departureTimeUtc || ride.departureTime;
 
   return (
     <DetailDrawer
@@ -49,9 +54,15 @@ export default function RideDetailsDrawer({
             { label: 'Fare', value: `NGN ${Number(ride.fare || 0).toLocaleString()}`, hint: 'Listed ride fare' },
             { label: 'Booked seats', value: ride.seatsBooked || 0, hint: `${bookedPercent}% occupancy` },
             { label: 'Open seats', value: ride.seatsAvailable || 0, hint: `${seatsTotal} total seats` },
-            { label: 'Schedule', value: ride.recurring ? 'Recurring' : 'Single', hint: 'Ride frequency' },
+            { label: 'Schedule', value: recurring ? 'Recurring' : 'Single', hint: recurring ? ride.recurringDays?.join(', ') || 'Recurring days unavailable' : 'One ride occurrence' },
           ]}
         />
+
+        {parentRideWarning && (
+          <div className="rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-200">
+            {parentRideWarning}
+          </div>
+        )}
 
         <DetailSection title="Route">
           <div className="space-y-4">
@@ -60,8 +71,12 @@ export default function RideDetailsDrawer({
               items={[
                 { label: 'Origin', value: rideAddress(ride.origin) },
                 { label: 'Destination', value: rideAddress(ride.destination) },
-                { label: 'Departure', value: ride.departureTime ? new Date(ride.departureTime).toLocaleString() : 'Not scheduled' },
+                { label: 'Departure', value: departure ? new Date(departure).toLocaleString() : 'Not scheduled' },
+                { label: 'Occurrence ID', value: ride.occurrenceId || 'N/A' },
+                { label: 'Arrival window', value: `${ride.arrivalWindowStartUtc ? new Date(ride.arrivalWindowStartUtc).toLocaleString() : 'N/A'} - ${ride.arrivalWindowEndUtc ? new Date(ride.arrivalWindowEndUtc).toLocaleString() : 'N/A'}` },
+                { label: 'Timezone offset', value: ride.timezoneOffset || 'N/A' },
                 { label: 'Seats', value: <SeatsIndicator total={seatsTotal} booked={ride.seatsBooked || 0} /> },
+                { label: 'Notification methods', value: ride.notificationMethods?.join(', ') || 'Default push' },
                 { label: 'Driver ID', value: ride.riderId || 'Unassigned' },
                 { label: 'Vehicle ID', value: ride.vehicleId || 'Unassigned' },
               ]}

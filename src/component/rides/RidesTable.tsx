@@ -43,10 +43,22 @@ export default function RidesTable({
               </td>
               <td className="px-4 py-3">{ride.riderId || 'Unassigned'}</td>
               <td className="px-4 py-3">
-                <div>{ride.recurring ? 'Recurring' : 'Single trip'}</div>
+                <div>{ride.recurring || ride.isRecurring ? 'Recurring' : 'Single trip'}</div>
                 <div className="text-xs text-slate-500 dark:text-slate-400">
-                  {ride.departureTime ? new Date(ride.departureTime).toLocaleString() : 'Not scheduled'}
+                  {ride.departureTimeUtc || ride.departureTime
+                    ? new Date(ride.departureTimeUtc || ride.departureTime || '').toLocaleString()
+                    : 'Not scheduled'}
                 </div>
+                {ride.occurrenceId && (
+                  <div className="text-xs text-slate-500 dark:text-slate-400">
+                    Occurrence: {ride.occurrenceId}
+                  </div>
+                )}
+                {ride.recurringDays?.length ? (
+                  <div className="text-xs text-slate-500 dark:text-slate-400">
+                    {ride.recurringDays.join(', ')}
+                  </div>
+                ) : null}
               </td>
               <td className="px-4 py-3">
                 <SeatsIndicator

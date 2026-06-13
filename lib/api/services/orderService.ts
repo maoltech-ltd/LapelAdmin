@@ -75,18 +75,13 @@ export const orderService = {
 
   // Update order status
   updateOrderStatus: async (device: string, orderId: string, status: OrderStatus, userId?: string): Promise<ApiResponse<OrderDto>> => {
-    const endpoint = userId 
-      ? `/api/v1/${device}/orders/${orderId}/status`
-      : `/api/v1/${device}/orders/status`;
-    
-    const response = await axiosInstance.put(
-      endpoint,
-      null,
-      {
-        params: { status },
-        headers: userId ? getHeaders(userId, orderId).headers : getHeaders(undefined, orderId).headers
-      }
-    );
+    const config = {
+      params: { status },
+      headers: userId ? getHeaders(userId, orderId).headers : getHeaders(undefined, orderId).headers
+    };
+    const response = userId
+      ? await axiosInstance.put(`/api/v1/${device}/orders/${orderId}/status`, null, config)
+      : await axiosInstance.patch(`/api/v1/${device}/orders/status`, null, config);
     return response.data;
   },
 

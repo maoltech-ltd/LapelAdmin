@@ -10,10 +10,18 @@ export interface AdminRide {
   origin?: AdminLocation;
   destination?: AdminLocation;
   departureTime?: string;
+  departureTimeUtc?: string;
+  occurrenceId?: string;
+  arrivalWindowStartUtc?: string;
+  arrivalWindowEndUtc?: string;
+  timezoneOffset?: string;
   recurring?: boolean;
+  isRecurring?: boolean;
+  recurringDays?: string[];
   fare?: number;
   seatsAvailable?: number;
   seatsBooked?: number;
+  notificationMethods?: string[];
   passengerUserIds?: string[];
   status?: string;
   vehicleId?: string;

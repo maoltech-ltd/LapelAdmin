@@ -1,10 +1,13 @@
 // types/order.types.ts
 export enum OrderStatus {
-  PENDING = 'PENDING',
+  CREATED = 'CREATED',
   CONFIRMED = 'CONFIRMED',
+  CANCEL_REQUESTED = 'CANCEL_REQUESTED',
+  DISPUTED = 'DISPUTED',
   CANCELLED = 'CANCELLED',
+  DRIVER_COMPLETED = 'DRIVER_COMPLETED',
   COMPLETED = 'COMPLETED',
-  // Add other statuses based on your OrderStatus enum
+  ONGOING = 'ONGOING',
 }
 
 export enum PaymentStatus {
@@ -17,27 +20,51 @@ export enum PaymentStatus {
 
 export enum RideStatus {
   PENDING = 'PENDING',
-  ACCEPTED = 'ACCEPTED',
-  IN_PROGRESS = 'IN_PROGRESS',
+  Available = 'Available',
+  ONGOING = 'ONGOING',
   COMPLETED = 'COMPLETED',
   CANCELLED = 'CANCELLED',
-  // Add other ride statuses
 }
 
 export interface OrderDto {
   id: string;
   rideId: string;
+  occurrenceId?: string;
   passengerId: string;
   driverId: string;
   fare: number;
   grossFare: number;
   discountAmount: number;
   deviceChargeAmount: number;
+  notificationChargeAmount?: number;
+  notificationMethods?: string[];
   platformChargeType: string;
   platformChargeRate: number;
+  device?: string;
   commissionAmount: number;
   driverEarning: number;
   seatsBooked: number;
+  couponCode?: string;
+  firstRideFreeApplied?: boolean;
+  walletDebited?: boolean;
+  driverCredited?: boolean;
+  requestedDepartureTime?: string;
+  requestedDepartureTimeUtc?: string;
+  arrivalWindowStartUtc?: string;
+  arrivalWindowEndUtc?: string;
+  timezoneOffset?: string;
+  rescheduleRequestedBy?: string;
+  pendingRescheduleDepartureTime?: string;
+  pendingRescheduleDepartureTimeUtc?: string;
+  rescheduleStatus?: string;
+  emergencyAlertedAt?: string;
+  emergencyAlertedBy?: string;
+  cancelRequestedBy?: string;
+  cancelRequestedAt?: string;
+  disputedBy?: string;
+  disputedAt?: string;
+  driverCompletedAt?: string;
+  customerConfirmedAt?: string;
   status: OrderStatus;
   payment: PaymentStatus;
   rideStatus: RideStatus;
@@ -58,7 +85,10 @@ export interface OrderSearchParams {
   sortDirection?: 'ASC' | 'DESC';
   status?: OrderStatus;
   payment?: PaymentStatus;
+  paymentStatus?: PaymentStatus;
   rideStatus?: RideStatus;
+  fromDate?: string;
+  toDate?: string;
 }
 
 export interface ApiResponse<T> {

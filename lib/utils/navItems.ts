@@ -3,6 +3,7 @@ import {
   Users,
   Car,
   Route,
+  ClipboardList,
   Settings,
   ShieldCheck,
   ChartNoAxesCombined,
@@ -41,6 +42,12 @@ const navItems = [
     href: '/rides',
     icon: Route,
     permissions: ['RIDE_READ'],
+  },
+  {
+    label: 'Orders',
+    href: '/orders',
+    icon: ClipboardList,
+    permissions: ['ORDER_READ'],
   },
   {
     label: 'Payments',
