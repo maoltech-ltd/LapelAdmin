@@ -9,6 +9,7 @@ import {
   ChartNoAxesCombined,
   Menu,
   Currency,
+  Repeat,
   X,
 } from 'lucide-react';
 
@@ -48,6 +49,12 @@ const navItems = [
     href: '/orders',
     icon: ClipboardList,
     permissions: ['ORDER_READ'],
+  },
+  {
+    label: 'Ride Payment Plans',
+    href: '/ride-payment-plans',
+    icon: Repeat,
+    permissions: ['PLAN_READ'],
   },
   {
     label: 'Payments',
