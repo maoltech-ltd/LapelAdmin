@@ -39,6 +39,8 @@ interface RideState {
   rideHistory: Ride[];
   riderHistory: Ride[];
   customerHistory: Ride[];
+  occurrences: any[];
+  occurrencesLoading: boolean;
   loading: boolean;
   error: string | null;
   totalRides: number;
@@ -52,6 +54,8 @@ const initialState: RideState = {
   rideHistory: [],
   riderHistory: [],
   customerHistory: [],
+  occurrences: [],
+  occurrencesLoading: false,
   loading: false,
   error: null,
   totalRides: 0,
@@ -119,6 +123,14 @@ export const fetchCustomerHistory = createAsyncThunk(
   'rides/fetchCustomerHistory',
   async ({ device, params }: { device: string; params?: any }) => {
     const response = await rideService.getCustomerHistory(device, params);
+    return response.data;
+  }
+);
+
+export const fetchRideOccurrences = createAsyncThunk(
+  'rides/fetchOccurrences',
+  async ({ device, rideId }: { device: string; rideId: string }) => {
+    const response = await rideService.getRideOccurrences(device, rideId);
     return response.data;
   }
 );
@@ -285,6 +297,19 @@ const rideSlice = createSlice({
       .addCase(fetchCustomerHistory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch customer history';
+      })
+      // Fetch ride occurrences
+      .addCase(fetchRideOccurrences.pending, (state) => {
+        state.occurrencesLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchRideOccurrences.fulfilled, (state, action) => {
+        state.occurrencesLoading = false;
+        state.occurrences = action.payload.data || action.payload.occurrences || action.payload;
+      })
+      .addCase(fetchRideOccurrences.rejected, (state, action) => {
+        state.occurrencesLoading = false;
+        state.error = action.error.message || 'Failed to fetch ride occurrences';
       });
   },
 });

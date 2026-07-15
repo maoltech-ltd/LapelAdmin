@@ -10,6 +10,8 @@ import {
   Menu,
   Currency,
   Repeat,
+  AlertTriangle,
+  MapPin,
   X,
 } from 'lucide-react';
 
@@ -51,10 +53,22 @@ const navItems = [
     permissions: ['ORDER_READ'],
   },
   {
+    label: 'Live Map',
+    href: '/rides/live-map',
+    icon: MapPin,
+    permissions: ['ORDER_READ'],
+  },
+  {
     label: 'Ride Payment Plans',
     href: '/ride-payment-plans',
     icon: Repeat,
     permissions: ['PLAN_READ'],
+  },
+  {
+    label: 'Disputes',
+    href: '/disputes',
+    icon: AlertTriangle,
+    permissions: ['ORDER_READ'],
   },
   {
     label: 'Payments',

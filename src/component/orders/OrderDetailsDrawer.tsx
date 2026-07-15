@@ -1,5 +1,6 @@
 'use client';
 
+import { ReactNode } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { OrderDto } from '../../../lib/types/order.types';
 import { DetailGrid, DetailSection, StatSummaryGrid } from '../utils/DetailBlocks';
@@ -11,10 +12,12 @@ export default function OrderDetailsDrawer({
   order,
   open,
   onClose,
+  footer,
 }: {
   order: OrderDto | null;
   open: boolean;
   onClose: () => void;
+  footer?: ReactNode;
 }) {
   if (!open || !order) return null;
 
@@ -29,6 +32,7 @@ export default function OrderDetailsDrawer({
       title="Order details"
       subtitle={`${order.passengerId} -> ${order.driverId}`}
       badge={<StatusBadge status={statusKey(order.status)} label={String(order.status).split('_').join(' ')} />}
+      footer={footer}
     >
       <div className="space-y-5">
         {flags.length > 0 && (

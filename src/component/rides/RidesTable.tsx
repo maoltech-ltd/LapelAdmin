@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import StatusBadge from '../utils/StatusBadge';
 import type { Status } from '../utils/StatusBadge';
 import { EmptyTableRow, TableShell, ViewButton } from '../utils/DataTable';
@@ -59,6 +60,15 @@ export default function RidesTable({
                     {ride.recurringDays.join(', ')}
                   </div>
                 ) : null}
+                {(ride.recurring || ride.isRecurring) && (
+                  <Link
+                    href={`/rides/${ride.id}/occurrences`}
+                    className="action-link text-xs text-blue-600 dark:text-blue-300"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    View series
+                  </Link>
+                )}
               </td>
               <td className="px-4 py-3">
                 <SeatsIndicator

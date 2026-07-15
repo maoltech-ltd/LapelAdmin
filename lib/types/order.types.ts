@@ -77,6 +77,17 @@ export interface OrderRequestDto {
   seats: number;
 }
 
+export enum DisputeResolution {
+  REFUND_PASSENGER = 'REFUND_PASSENGER',
+  PAY_DRIVER = 'PAY_DRIVER',
+  DISMISS = 'DISMISS',
+}
+
+export interface DisputeResolutionRequest {
+  resolution: DisputeResolution;
+  note?: string;
+}
+
 export interface OrderSearchParams {
   query?: string;
   page?: number;

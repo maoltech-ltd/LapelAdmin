@@ -29,3 +29,21 @@ export interface AdminRide {
 
 export const rideAddress = (location?: AdminLocation) =>
   location?.address || [location?.latitude, location?.longitude].filter(Boolean).join(', ') || 'Unknown';
+
+export interface AdminOccurrenceRosterEntry {
+  orderId?: string;
+  passengerId?: string;
+  passengerName?: string;
+  passengerPhone?: string;
+  orderStatus?: string;
+}
+
+export interface AdminRideOccurrence {
+  id: string;
+  rideId?: string;
+  departureTimeUtc?: string;
+  status?: string;
+  seatsAvailable?: number;
+  seatsBooked?: number;
+  roster?: AdminOccurrenceRosterEntry[];
+}

@@ -9,6 +9,7 @@ import {
   fetchRideHistory,
   fetchRiderHistory,
   fetchCustomerHistory,
+  fetchRideOccurrences,
   clearRides,
   clearHistory,
   setCurrentRide,
@@ -24,6 +25,8 @@ export const useRide = () => {
     rideHistory,
     riderHistory,
     customerHistory,
+    occurrences,
+    occurrencesLoading,
     loading,
     error,
     totalRides,
@@ -86,6 +89,13 @@ export const useRide = () => {
     [dispatch]
   );
 
+  const getRideOccurrences = useCallback(
+    async (device: string, rideId: string) => {
+      return dispatch(fetchRideOccurrences({ device, rideId }));
+    },
+    [dispatch]
+  );
+
   const clearAllRides = useCallback(() => {
     dispatch(clearRides());
   }, [dispatch]);
@@ -113,6 +123,8 @@ export const useRide = () => {
     rideHistory,
     riderHistory,
     customerHistory,
+    occurrences,
+    occurrencesLoading,
     loading,
     error,
     totalRides,
@@ -127,6 +139,7 @@ export const useRide = () => {
     getRideHistory,
     getRiderHistory,
     getCustomerHistory,
+    getRideOccurrences,
     clearRides: clearAllRides,
     clearHistory: clearAllHistory,
     setCurrentRide: setRide,

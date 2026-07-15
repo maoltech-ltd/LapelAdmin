@@ -35,4 +35,7 @@ export const rideService = {
 
   getCustomerHistory: (device: string, params?: any) =>
     axiosInstance.get(`/api/v1/${device}/rides/history/customer`, { params }),
+
+  getRideOccurrences: (device: string, rideId: string) =>
+    axiosInstance.get(`/api/v1/${device}/rides/${rideId}/occurrences`),
 };
