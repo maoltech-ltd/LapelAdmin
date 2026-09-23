@@ -1,11 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { transactionService } from '../../api/services';
-import { PaginatedResponse, Transaction } from '../../types/transaction.type';
+import { PaginatedResponse, Transaction, TransactionVerifyResult } from '../../types/transaction.type';
 
 
 interface TransactionState {
   transactions: PaginatedResponse<Transaction> | null;
   currentTransaction: Transaction | null;
+  verifyResult: TransactionVerifyResult | null;
+  verifying: boolean;
   loading: boolean;
   error: string | null | undefined;
   success: boolean;
@@ -15,6 +17,8 @@ interface TransactionState {
 const initialState: TransactionState = {
   transactions: null,
   currentTransaction: null,
+  verifyResult: null,
+  verifying: false,
   loading: false,
   error: null,
   success: false
@@ -49,12 +53,20 @@ export const flagTransaction = createAsyncThunk(
   }
 );
 
+export const verifyTransaction = createAsyncThunk(
+  'transactions/verify',
+  async ({ device, reference, force }: any) => {
+    return await transactionService.verifyTransaction(device, reference, force);
+  }
+);
+
 const transactionSlice = createSlice({
   name: 'transactions',
   initialState: initialState,
   reducers: {
     clearTransaction: (state) => {
       state.currentTransaction = null;
+      state.verifyResult = null;
     },
     clearError: (state) => {
       state.error = null;
@@ -102,6 +114,26 @@ const transactionSlice = createSlice({
           (tx) => tx.reference === action.payload.data.reference
         );
         if (index !== -1) state.transactions.content[index] = action.payload.data;
+      })
+
+      // Verify against payment provider
+      .addCase(verifyTransaction.pending, (state) => {
+        state.verifying = true;
+      })
+      .addCase(verifyTransaction.fulfilled, (state, action) => {
+        state.verifying = false;
+        state.verifyResult = action.payload.data;
+        state.currentTransaction = action.payload.data.transaction;
+        if (state.transactions) {
+          const index = state.transactions.content.findIndex(
+            (tx) => tx.reference === action.payload.data.transaction.reference
+          );
+          if (index !== -1) state.transactions.content[index] = action.payload.data.transaction;
+        }
+      })
+      .addCase(verifyTransaction.rejected, (state, action) => {
+        state.verifying = false;
+        state.error = action.error?.message;
       });
 
   }

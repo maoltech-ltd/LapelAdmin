@@ -5,6 +5,7 @@ import {
   fetchTransactionByRef,
   retryTransaction,
   flagTransaction,
+  verifyTransaction,
   clearTransaction,
   clearError
 } from '../store/slices/transactionSlice';
@@ -17,6 +18,8 @@ export const useTransaction = () => {
   const {
     transactions,
     currentTransaction,
+    verifyResult,
+    verifying,
     loading,
     error
   } = useSelector((state: RootState) => state.transactions);
@@ -31,12 +34,16 @@ export const useTransaction = () => {
     dispatch(retryTransaction({ device, reference }) as any), [dispatch]);
   const flag = useCallback((device: string, reference: string) =>
     dispatch(flagTransaction({ device, reference }) as any), [dispatch]);
+  const verify = useCallback((device: string, reference: string, force?: boolean) =>
+    dispatch(verifyTransaction({ device, reference, force }) as any), [dispatch]);
 
   return {
 
     // State
     transactions,
     currentTransaction,
+    verifyResult,
+    verifying,
     loading,
     error,
 
@@ -46,6 +53,7 @@ export const useTransaction = () => {
     clearTransaction: clearCurrentTransaction,
     clearError: clearTransactionError,
     retryTransaction: retry,
-    flagTransaction: flag
+    flagTransaction: flag,
+    verifyTransaction: verify
   };
 };

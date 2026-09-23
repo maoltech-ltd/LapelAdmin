@@ -1,9 +1,10 @@
 import axiosInstance from '../../axios/axiosInstance';
-import { 
-    TransactionSearchParams, 
-    ApiResponse, 
-    PaginatedResponse, 
-    Transaction
+import {
+    TransactionSearchParams,
+    ApiResponse,
+    PaginatedResponse,
+    Transaction,
+    TransactionVerifyResult
 } from '../../types/transaction.type';
 
 
@@ -53,6 +54,20 @@ export const transactionService = {
   ): Promise<ApiResponse<Transaction>> => {
     const response = await axiosInstance.post(
       `/api/v1/${device}/transactions/${reference}/flag`
+    );
+
+    return response.data;
+  },
+
+  verifyTransaction: async (
+    device: string,
+    reference: string,
+    force = false
+  ): Promise<ApiResponse<TransactionVerifyResult>> => {
+    const response = await axiosInstance.post(
+      `/api/v1/${device}/transactions/${reference}/verify`,
+      null,
+      { params: force ? { force: true } : undefined }
     );
 
     return response.data;

@@ -9,3 +9,4 @@ export * from './roleService';
 export * from './onboardService';
 export * from './dashboardService';
 export * from './transactionService';
+export * from './consoleService';

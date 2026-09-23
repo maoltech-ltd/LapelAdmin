@@ -26,6 +26,13 @@ export interface Transaction {
   createdAt: string;
 }
 
+export interface TransactionVerifyResult {
+  transaction: Transaction;
+  providerChecked: boolean;
+  drifted: boolean;
+  providerResult?: Record<string, unknown>;
+}
+
 export interface TransactionSearchParams {
   page?: number;
   size?: number;

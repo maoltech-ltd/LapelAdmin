@@ -15,9 +15,12 @@ export default function TransactionsPage() {
   const {
     transactions,
     currentTransaction,
+    verifyResult,
+    verifying,
     getTransactions,
     getTransactionByReference,
     clearTransaction,
+    verifyTransaction,
   } = useTransaction();
 
   const [page, setPage] = useState(1);
@@ -76,7 +79,14 @@ export default function TransactionsPage() {
 
       {totalPages > 1 && <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />}
 
-      <TransactionDrawer transaction={currentTransaction} open={!!currentTransaction} onClose={clearTransaction} />
+      <TransactionDrawer
+        transaction={currentTransaction}
+        open={!!currentTransaction}
+        onClose={clearTransaction}
+        verifyResult={verifyResult}
+        verifying={verifying}
+        onVerify={(force) => currentTransaction && verifyTransaction(DEVICE, currentTransaction.reference, force)}
+      />
     </div>
   );
 }

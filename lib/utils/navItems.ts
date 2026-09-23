@@ -12,6 +12,7 @@ import {
   Repeat,
   AlertTriangle,
   MapPin,
+  Terminal,
   X,
 } from 'lucide-react';
 
@@ -93,6 +94,12 @@ const navItems = [
     href: '/settings',
     icon: Settings,
     permissions: ['EDIT_SETTINGS'],
+  },
+  {
+    label: 'Dev Console',
+    href: '/dev-console',
+    icon: Terminal,
+    permissions: ['CONSOLE_ACCESS'],
   },
 ];
 
