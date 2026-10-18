@@ -11,6 +11,7 @@ import {
   Currency,
   Repeat,
   AlertTriangle,
+  Building2,
   MapPin,
   Terminal,
   X,
@@ -64,6 +65,12 @@ const navItems = [
     href: '/ride-payment-plans',
     icon: Repeat,
     permissions: ['PLAN_READ'],
+  },
+  {
+    label: 'Companies',
+    href: '/companies',
+    icon: Building2,
+    permissions: ['COMPANY_READ'],
   },
   {
     label: 'Disputes',
