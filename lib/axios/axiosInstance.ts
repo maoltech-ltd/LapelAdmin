@@ -40,9 +40,17 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     // Handle common errors globally
-    if (error.response?.status === 401) {
+    // A 401 from login/password-reset means bad credentials, not an expired session:
+    // keep the user on the page and surface the server's message instead of reloading.
+    const isPublicAuthCall = /\/admin\/admins\/(login|password-reset)/.test(error.config?.url || '');
+    if (error.response?.status === 401 && isPublicAuthCall) {
+      const data = error.response.data;
+      if (data && typeof data === 'object' && typeof data.message === 'string' && data.message.trim()) {
+        error.message = data.message;
+      }
+    } else if (error.response?.status === 401) {
       // Handle unauthorized access
-      if (typeof window !== 'undefined') {
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
         localStorage.removeItem('authToken');
         window.location.href = '/login';
       }
