@@ -17,7 +17,7 @@ export const transactionService = {
   ): Promise<ApiResponse<PaginatedResponse<Transaction>>> => {
 
     const response = await axiosInstance.get(
-      `/api/v1/${device}/transactions`,
+      `/api/v1/${device}/admin/transactions`,
       { params }
     );
 
@@ -31,7 +31,7 @@ export const transactionService = {
   ): Promise<ApiResponse<Transaction>> => {
 
     const response = await axiosInstance.get(
-      `/api/v1/${device}/transactions/${reference}`
+      `/api/v1/${device}/admin/transactions/${reference}`
     );
 
     return response.data;
@@ -42,7 +42,7 @@ export const transactionService = {
     reference: string
   ): Promise<ApiResponse<Transaction>> => {
     const response = await axiosInstance.post(
-      `/api/v1/${device}/transactions/${reference}/retry`
+      `/api/v1/${device}/admin/transactions/${reference}/retry`
     );
 
     return response.data;
@@ -53,7 +53,7 @@ export const transactionService = {
     reference: string
   ): Promise<ApiResponse<Transaction>> => {
     const response = await axiosInstance.post(
-      `/api/v1/${device}/transactions/${reference}/flag`
+      `/api/v1/${device}/admin/transactions/${reference}/flag`
     );
 
     return response.data;
@@ -65,7 +65,7 @@ export const transactionService = {
     force = false
   ): Promise<ApiResponse<TransactionVerifyResult>> => {
     const response = await axiosInstance.post(
-      `/api/v1/${device}/transactions/${reference}/verify`,
+      `/api/v1/${device}/admin/transactions/${reference}/verify`,
       null,
       { params: force ? { force: true } : undefined }
     );

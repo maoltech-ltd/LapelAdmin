@@ -36,13 +36,13 @@ interface UserProfileData {
 export const onboardService = {
   // Profile management
   updateProfile: (data: OnboardProfileData) =>
-    axiosInstance.post(`/api/v1/${data.device}/onboard/update-profile`, data),
+    axiosInstance.post(`/api/v1/${data.device}/admin/onboard/update-profile`, data),
 
   updateProfilePicture: (data: ProfilePictureData) => {
     const formData = new FormData();
     formData.append('image', data.image);
     return axiosInstance.post(
-      `/api/v1/${data.device}/onboard/update-profile-picture`,
+      `/api/v1/${data.device}/admin/onboard/update-profile-picture`,
       formData,
       {
         headers: {
@@ -53,30 +53,30 @@ export const onboardService = {
   },
 
   getUserProfile: (data: UserProfileData) =>
-    axiosInstance.post(`/api/v1/${data.device}/onboard/get-user-profile`, {
+    axiosInstance.post(`/api/v1/${data.device}/admin/onboard/get-user-profile`, {
       userId: data.userId,
     }),
 
   // OTP verification
   secondOTPVerification: (data: OTPVerificationData) =>
-    axiosInstance.post(`/api/v1/${data.device}/onboard/second-otp-verification`, {
+    axiosInstance.post(`/api/v1/${data.device}/admin/onboard/second-otp-verification`, {
       otp: data.otp,
       userId: data.userId,
     }),
 
   resendVerificationOTP: (device: string, userId: string) =>
-    axiosInstance.post(`/api/v1/${device}/onboard/resend-verification-otp`, {
+    axiosInstance.post(`/api/v1/${device}/admin/onboard/resend-verification-otp`, {
       userId,
     }),
 
   // Onboarding completion
   completeOnboarding: (device: string, userId: string, data?: any) =>
-    axiosInstance.post(`/api/v1/${device}/onboard/complete-onboarding`, {
+    axiosInstance.post(`/api/v1/${device}/admin/onboard/complete-onboarding`, {
       userId,
       ...data,
     }),
 
   // Rider onboarding
   becomeARider: (data: BecomeRiderData) =>
-    axiosInstance.post(`/api/v1/${data.device}/onboard/become-a-rider`, data),
+    axiosInstance.post(`/api/v1/${data.device}/admin/onboard/become-a-rider`, data),
 };

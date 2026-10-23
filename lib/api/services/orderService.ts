@@ -16,7 +16,7 @@ const getHeaders = (userId?: string, orderId?: string) => {
   };
   
   if (userId) {
-    headers['USER-ID'] = userId;
+    headers['X-USER-ID'] = userId;
   }
 
   if (orderId) {
@@ -30,7 +30,7 @@ export const orderService = {
   // Create a new order
   createOrder: async (device: string, userId: string, data: OrderRequestDto): Promise<ApiResponse<OrderDto>> => {
     const response = await axiosInstance.post(
-      `/api/v1/${device}/orders/book`,
+      `/api/v1/${device}/admin/orders/book`,
       data,
       getHeaders(userId)
     );
@@ -40,7 +40,7 @@ export const orderService = {
   // Get order by ID
   getOrderById: async (device: string, orderId: string): Promise<ApiResponse<OrderDto>> => {
     const response = await axiosInstance.get(
-      `/api/v1/${device}/orders/details`,
+      `/api/v1/${device}/admin/orders/details`,
       getHeaders(undefined, orderId)
     );
     return response.data;
@@ -48,7 +48,7 @@ export const orderService = {
 
   // Get all orders with pagination and search
   getAllOrders: async (device: string, params: OrderSearchParams): Promise<ApiResponse<PaginatedResponse<OrderDto>>> => {
-    const response = await axiosInstance.get(`/api/v1/${device}/orders`, {
+    const response = await axiosInstance.get(`/api/v1/${device}/admin/orders`, {
       params,
       ...getHeaders()
     });
@@ -58,7 +58,7 @@ export const orderService = {
   // Get passenger's orders
   getPassengerOrders: async (device: string, userId: string): Promise<ApiResponse<OrderDto[]>> => {
     const response = await axiosInstance.get(
-      `/api/v1/${device}/orders/passenger`,
+      `/api/v1/${device}/admin/orders/passenger`,
       getHeaders(userId)
     );
     return response.data;
@@ -67,7 +67,7 @@ export const orderService = {
   // Get driver's orders
   getDriverOrders: async (device: string, userId: string): Promise<ApiResponse<OrderDto[]>> => {
     const response = await axiosInstance.get(
-      `/api/v1/${device}/orders/driver`,
+      `/api/v1/${device}/admin/orders/driver`,
       getHeaders(userId)
     );
     return response.data;
@@ -80,15 +80,15 @@ export const orderService = {
       headers: userId ? getHeaders(userId, orderId).headers : getHeaders(undefined, orderId).headers
     };
     const response = userId
-      ? await axiosInstance.put(`/api/v1/${device}/orders/${orderId}/status`, null, config)
-      : await axiosInstance.patch(`/api/v1/${device}/orders/status`, null, config);
+      ? await axiosInstance.put(`/api/v1/${device}/admin/orders/${orderId}/status`, null, config)
+      : await axiosInstance.patch(`/api/v1/${device}/admin/orders/status`, null, config);
     return response.data;
   },
 
   // Update payment status
   updatePaymentStatus: async (device: string, orderId: string, payment: PaymentStatus): Promise<ApiResponse<OrderDto>> => {
     const response = await axiosInstance.put(
-      `/api/v1/${device}/orders/${orderId}/payment`,
+      `/api/v1/${device}/admin/orders/${orderId}/payment`,
       null,
       {
         params: { payment },
@@ -101,21 +101,21 @@ export const orderService = {
   // Statistics
   getTotalOrders: async (device: string): Promise<ApiResponse<number>> => {
     const response = await axiosInstance.get(
-      `/api/v1/${device}/orders/stats/total`
+      `/api/v1/${device}/admin/orders/stats/total`
     );
     return response.data;
   },
 
   getPaidOrders: async (device: string): Promise<ApiResponse<number>> => {
     const response = await axiosInstance.get(
-      `/api/v1/${device}/orders/stats/paid`
+      `/api/v1/${device}/admin/orders/stats/paid`
     );
     return response.data;
   },
 
   getOrdersByStatus: async (device: string, status: OrderStatus): Promise<ApiResponse<number>> => {
     const response = await axiosInstance.get(
-      `/api/v1/${device}/orders/stats/status`,
+      `/api/v1/${device}/admin/orders/stats/status`,
       {
         params: { status }
       }

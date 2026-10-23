@@ -44,7 +44,7 @@ export default function CommissionSettings({
 
   return (
     <SettingsSection title="Pricing & Commission" description="Control platform earnings and ride limits">
-      <SettingField label="Commission (%)" description="Percentage retained by the platform from completed rides.">
+      <SettingField label="Commission (%)" description="Percentage retained by the platform from driver earnings: completed rides, late-cancellation fees and no-show shares. Applied when the driver is paid.">
         <input
           type="number"
           className="input w-full"

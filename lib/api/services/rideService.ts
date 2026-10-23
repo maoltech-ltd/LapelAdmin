@@ -11,31 +11,31 @@ interface RideData {
 
 export const rideService = {
   getRideById: (device: string, rideId: string) =>
-    axiosInstance.get(`/api/v1/${device}/rides/${rideId}`),
+    axiosInstance.get(`/api/v1/${device}/admin/rides/${rideId}`),
 
   updateRideStatus: (device: string, rideId: string, status: string) =>
-    axiosInstance.put(`/api/v1/${device}/rides/${rideId}/status`, null, {
+    axiosInstance.put(`/api/v1/${device}/admin/rides/${rideId}/status`, null, {
       params: { status },
     }),
 
   persistRide: (device: string, data: RideData) =>
-    axiosInstance.post(`/api/v1/${device}/rides/persist`, data),
+    axiosInstance.post(`/api/v1/${device}/admin/rides/persist`, data),
 
   offerRide: (device: string, data: RideData) =>
-    axiosInstance.post(`/api/v1/${device}/rides/offer`, data),
+    axiosInstance.post(`/api/v1/${device}/admin/rides/offer`, data),
 
   getAvailableRides: (device: string, params?: any) =>
-    axiosInstance.post(`/api/v1/${device}/rides/available`, params),
+    axiosInstance.post(`/api/v1/${device}/admin/rides/available`, params),
 
   getRideHistory: (device: string, params?: any) =>
-    axiosInstance.get(`/api/v1/${device}/rides/history`, { params }),
+    axiosInstance.get(`/api/v1/${device}/admin/rides/history`, { params }),
 
   getRiderHistory: (device: string, params?: any) =>
-    axiosInstance.get(`/api/v1/${device}/rides/history/rider`, { params }),
+    axiosInstance.get(`/api/v1/${device}/admin/rides/history/rider`, { params }),
 
   getCustomerHistory: (device: string, params?: any) =>
-    axiosInstance.get(`/api/v1/${device}/rides/history/customer`, { params }),
+    axiosInstance.get(`/api/v1/${device}/admin/rides/history/customer`, { params }),
 
   getRideOccurrences: (device: string, rideId: string) =>
-    axiosInstance.get(`/api/v1/${device}/rides/${rideId}/occurrences`),
+    axiosInstance.get(`/api/v1/${device}/admin/rides/${rideId}/occurrences`),
 };

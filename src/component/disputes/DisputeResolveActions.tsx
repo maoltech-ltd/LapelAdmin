@@ -10,17 +10,23 @@ const RESOLUTION_COPY: Record<DisputeResolution, { label: string; confirm: (orde
   [DisputeResolution.REFUND_PASSENGER]: {
     label: 'Refund passenger',
     confirm: (order) =>
-      `Refund ${money(order.fare)} to the passenger's wallet and cancel this order? This cannot be undone.`,
+      order.noShowAt
+        ? `Reverse this no-show: refund the ${money(order.cancellationFee ?? 0)} kept from the passenger and cancel the order? The driver keeps the share already paid. This cannot be undone.`
+        : `Refund ${money(order.fare)} to the passenger's wallet and cancel this order? This cannot be undone.`,
   },
   [DisputeResolution.PAY_DRIVER]: {
     label: 'Pay driver',
     confirm: (order) =>
-      `Release ${money(order.driverEarning || order.fare)} to the driver's wallet and complete this order? This cannot be undone.`,
+      order.noShowAt
+        ? 'Uphold the no-show? The 50/50 split already paid stays as is and the order returns to NO_SHOW.'
+        : `Release ${money(order.driverEarning || order.fare)} to the driver's wallet and complete this order? This cannot be undone.`,
   },
   [DisputeResolution.DISMISS]: {
     label: 'Dismiss',
-    confirm: () =>
-      'Dismiss this dispute with no wallet changes? The order returns to its in-progress state for normal completion.',
+    confirm: (order) =>
+      order.noShowAt
+        ? 'Dismiss this dispute with no wallet changes? The order returns to NO_SHOW.'
+        : 'Dismiss this dispute with no wallet changes? The order returns to its in-progress state for normal completion.',
   },
 };
 

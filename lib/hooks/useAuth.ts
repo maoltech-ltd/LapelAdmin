@@ -1,4 +1,5 @@
 // hooks/useAuth.ts
+import { authService } from '../api/services/authService';
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback } from 'react';
 import { RootState } from '../store/store';
@@ -56,7 +57,11 @@ export const useAuth = () => {
     changePassword: (device: string, data: any) => 
       dispatch(changePassword({ device, data }) as any),
     
-    logout: () => dispatch(logout()),
+    logout: () => {
+      // Best effort: clear the local session even if the server call fails.
+      authService.logout('web').catch(() => undefined);
+      dispatch(logout());
+    },
     clearError: clearAuthError,
     clearSuccess: () => dispatch(clearSuccess()),
   };

@@ -25,7 +25,7 @@ const getHeaders = (userId?: string) => {
 export const userService = {
   // Search users with pagination
   searchUsers: async (device: string, params: UserSearchParams): Promise<ApiResponse<PaginatedResponse<User>>> => {
-    const response = await axiosInstance.get(`/api/v1/${device}/users/search`, {
+    const response = await axiosInstance.get(`/api/v1/${device}/admin/users/search`, {
       params,
       ...getHeaders()
     });
@@ -34,7 +34,7 @@ export const userService = {
 
   // Get user by ID
   getUserById: async (device: string, userId: string): Promise<ApiResponse<User>> => {
-    const response = await axiosInstance.get(`/api/v1/${device}/users`, {
+    const response = await axiosInstance.get(`/api/v1/${device}/admin/users`, {
       ...getHeaders(userId)
     });
     return response.data;
@@ -43,7 +43,7 @@ export const userService = {
   // Update user
   updateUser: async (device: string, userId: string, data: UpdateUserData): Promise<ApiResponse<User>> => {
     const response = await axiosInstance.put(
-      `/api/v1/${device}/users/update`,
+      `/api/v1/${device}/admin/users/update`,
       data,
       getHeaders(userId)
     );
@@ -53,20 +53,20 @@ export const userService = {
   // Delete user
   deleteUser: async (device: string, userId: string): Promise<ApiResponse<void>> => {
     const response = await axiosInstance.delete(
-      `/api/v1/${device}/users/delete`,
+      `/api/v1/${device}/admin/users/delete`,
       getHeaders(userId)
     );
     return response.data;
   },
 
   activateUser: async (device: string, userId: string): Promise<ApiResponse<User>> => {
-    const response = await axiosInstance.put(`/api/v1/${device}/users/${userId}/activate`);
+    const response = await axiosInstance.put(`/api/v1/${device}/admin/users/${userId}/activate`);
     return response.data;
   },
 
   deactivateUser: async (device: string, userId: string, reason?: string): Promise<ApiResponse<User>> => {
     const response = await axiosInstance.put(
-      `/api/v1/${device}/users/${userId}/deactivate`,
+      `/api/v1/${device}/admin/users/${userId}/deactivate`,
       null,
       { params: reason ? { reason } : undefined }
     );
@@ -74,14 +74,14 @@ export const userService = {
   },
 
   getUserReports: async (device: string, userId: string): Promise<ApiResponse<UserReport[]>> => {
-    const response = await axiosInstance.get(`/api/v1/${device}/reports/users/${userId}`);
+    const response = await axiosInstance.get(`/api/v1/${device}/admin/reports/users/${userId}`);
     return response.data;
   },
 
   // Change password (Super Admin only)
   changePassword: async (device: string, userId: string, data: ChangePasswordData): Promise<ApiResponse<string>> => {
     const response = await axiosInstance.post(
-      `/api/v1/${device}/users/change-password`,
+      `/api/v1/${device}/admin/users/change-password`,
       data,
       getHeaders(userId)
     );
@@ -91,7 +91,7 @@ export const userService = {
   // Update profile picture
   updateProfilePicture: async (device: string, userId: string, imageUrl: string): Promise<ApiResponse<string>> => {
     const response = await axiosInstance.post(
-      `/api/v1/${device}/users/update-profile-picture`,
+      `/api/v1/${device}/admin/users/update-profile-picture`,
       { imageUrl }, // Note: Your backend expects imageUrl as param, but I'm sending in body
       getHeaders(userId)
     );
@@ -101,7 +101,7 @@ export const userService = {
   // Alternative method if backend expects query param
   updateProfilePictureWithParam: async (device: string, userId: string, imageUrl: string): Promise<ApiResponse<string>> => {
     const response = await axiosInstance.post(
-      `/api/v1/${device}/users/update-profile-picture`,
+      `/api/v1/${device}/admin/users/update-profile-picture`,
       null, // Empty body
       {
         params: { imageUrl },

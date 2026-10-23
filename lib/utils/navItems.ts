@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   MapPin,
   Terminal,
+  Megaphone,
   X,
 } from 'lucide-react';
 
@@ -82,6 +83,12 @@ const navItems = [
     href: '/transactions',
     icon: Currency,
     permissions: ['TRANSACTION_READ'],
+  },
+  {
+    label: 'Notifications',
+    href: '/notifications',
+    icon: Megaphone,
+    permissions: ['NOTIFICATION_READ', 'NOTIFICATION_SEND'],
   },
   {
     label: 'Roles & Permissions',

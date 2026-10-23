@@ -47,7 +47,10 @@ export const orderFlags = (order: OrderDto) => {
     flags.push('Cancellation awaiting counterparty or support action');
   }
   if (status === 'DISPUTED') {
-    flags.push('Support review required');
+    flags.push(order.noShowAt ? 'Disputed no-show: support review required' : 'Support review required');
+  }
+  if (status === 'NO_SHOW' && (order.cancellationDriverShare ?? 0) > 0 && !order.driverCredited) {
+    flags.push('No-show driver share not credited yet (retry cron pending)');
   }
   return flags;
 };

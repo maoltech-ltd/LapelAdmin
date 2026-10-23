@@ -8,6 +8,7 @@ export enum OrderStatus {
   DRIVER_COMPLETED = 'DRIVER_COMPLETED',
   COMPLETED = 'COMPLETED',
   ONGOING = 'ONGOING',
+  NO_SHOW = 'NO_SHOW',
 }
 
 export enum PaymentStatus {
@@ -65,6 +66,16 @@ export interface OrderDto {
   disputedAt?: string;
   driverCompletedAt?: string;
   customerConfirmedAt?: string;
+  // Cancellation / no-show policy (set by Lapel)
+  cancelledBy?: string;
+  cancelledAt?: string;
+  cancellationReason?: string;
+  cancellationFee?: number;
+  cancellationDriverShare?: number;
+  driverArrivedAt?: string;
+  noShowAt?: string;
+  rideChangedAt?: string;
+  noShowFeeRefunded?: boolean;
   status: OrderStatus;
   payment: PaymentStatus;
   rideStatus: RideStatus;

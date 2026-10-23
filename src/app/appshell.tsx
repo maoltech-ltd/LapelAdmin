@@ -5,6 +5,7 @@ import Header from '@/component/layout/Header';
 import Sidebar from '@/component/layout/Sidebar';
 import Footer from '@/component/layout/Footer';
 import AuthGuard from '@/component/guards/AuthGuard';
+import PermissionDeniedNotice from '@/component/layout/PermissionDeniedNotice';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -25,6 +26,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </main>
         </div>
         <Footer />
+        <PermissionDeniedNotice />
       </div>
     </AuthGuard>
   );

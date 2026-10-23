@@ -12,22 +12,27 @@ export const authService = {
   // Admin login
   login: async (device: string, data: LoginDto): Promise<ApiResponse<AuthResponseDto>> => {
     const response = await axiosInstance.post(
-      `/api/v1/${device}/admins/login`,
+      `/api/v1/${device}/admin/admins/login`,
       data
     );
     return response.data;
   },
 
+  // Revoke this admin session on the server (the token stops working immediately)
+  logout: async (device: string): Promise<void> => {
+    await axiosInstance.post(`/api/v1/${device}/admin/admins/logout`);
+  },
+
   // Get current admin profile
   getCurrentAdmin: async (device: string): Promise<ApiResponse<any>> => {
-    const response = await axiosInstance.get(`/api/v1/${device}/admins/me`);
+    const response = await axiosInstance.get(`/api/v1/${device}/admin/admins/me`);
     return response.data;
   },
 
   // Request password reset
   requestPasswordReset: async (device: string, identifier: string): Promise<ApiResponse<string>> => {
     const response = await axiosInstance.post(
-      `/api/v1/${device}/admins/password-reset/request`,
+      `/api/v1/${device}/admin/admins/password-reset/request`,
       null,
       {
         params: { identifier }
@@ -39,7 +44,7 @@ export const authService = {
   // Reset password
   resetPassword: async (device: string, data: ResetPasswordDto): Promise<ApiResponse<string>> => {
     const response = await axiosInstance.post(
-      `/api/v1/${device}/admins/password-reset`,
+      `/api/v1/${device}/admin/admins/password-reset`,
       data
     );
     return response.data;
@@ -48,7 +53,7 @@ export const authService = {
   // Change password (authenticated)
   changePassword: async (device: string, data: AdminChangePasswordDto): Promise<ApiResponse<string>> => {
     const response = await axiosInstance.post(
-      `/api/v1/${device}/admins/change-password`,
+      `/api/v1/${device}/admin/admins/change-password`,
       data
     );
     return response.data;

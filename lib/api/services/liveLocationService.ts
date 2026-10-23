@@ -15,5 +15,5 @@ export interface LiveRideLocation {
 
 export const liveLocationService = {
   getLiveLocations: (device: string) =>
-    axiosInstance.get(`/api/v1/${device}/rides/live-locations`),
+    axiosInstance.get(`/api/v1/${device}/admin/rides/live-locations`),
 };

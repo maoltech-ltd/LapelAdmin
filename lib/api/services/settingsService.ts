@@ -48,22 +48,22 @@ export interface Coupon {
 
 export const settingsService = {
   getSettings: async (device: string) => {
-    const response = await axiosInstance.get(`/api/v1/${device}/settings`);
+    const response = await axiosInstance.get(`/api/v1/${device}/admin/settings`);
     return response.data;
   },
 
   updateSettings: async (device: string, data: PlatformSettings) => {
-    const response = await axiosInstance.put(`/api/v1/${device}/settings`, data);
+    const response = await axiosInstance.put(`/api/v1/${device}/admin/settings`, data);
     return response.data;
   },
 
   getCoupons: async (device: string) => {
-    const response = await axiosInstance.get(`/api/v1/${device}/coupons`);
+    const response = await axiosInstance.get(`/api/v1/${device}/admin/coupons`);
     return response.data;
   },
 
   issueCoupon: async (device: string, data: Coupon) => {
-    const response = await axiosInstance.post(`/api/v1/${device}/coupons`, data);
+    const response = await axiosInstance.post(`/api/v1/${device}/admin/coupons`, data);
     return response.data;
   },
 };

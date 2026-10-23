@@ -10,3 +10,5 @@ export * from './onboardService';
 export * from './dashboardService';
 export * from './transactionService';
 export * from './consoleService';
+export * from './broadcastService';
+

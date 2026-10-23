@@ -16,12 +16,12 @@ export const disputeService = {
     device: string,
     params: Omit<OrderSearchParams, 'status'>,
   ): Promise<ApiResponse<PaginatedResponse<OrderDto>>> => {
-    const response = await axiosInstance.get(`/api/v1/${device}/disputes`, { params });
+    const response = await axiosInstance.get(`/api/v1/${device}/admin/disputes`, { params });
     return response.data;
   },
 
   getDispute: async (device: string, orderId: string): Promise<ApiResponse<OrderDto>> => {
-    const response = await axiosInstance.get(`/api/v1/${device}/disputes/${orderId}`);
+    const response = await axiosInstance.get(`/api/v1/${device}/admin/disputes/${orderId}`);
     return response.data;
   },
 
@@ -30,7 +30,7 @@ export const disputeService = {
     orderId: string,
     request: DisputeResolutionRequest,
   ): Promise<ApiResponse<OrderDto>> => {
-    const response = await axiosInstance.post(`/api/v1/${device}/disputes/${orderId}/resolve`, request);
+    const response = await axiosInstance.post(`/api/v1/${device}/admin/disputes/${orderId}/resolve`, request);
     return response.data;
   },
 };

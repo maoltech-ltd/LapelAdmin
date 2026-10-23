@@ -101,6 +101,7 @@ export default function OrdersPage() {
           { label: 'Disputed', value: 'DISPUTED' },
           { label: 'Completed', value: 'COMPLETED' },
           { label: 'Cancelled', value: 'CANCELLED' },
+          { label: 'No-show', value: 'NO_SHOW' },
         ]}
       />
 

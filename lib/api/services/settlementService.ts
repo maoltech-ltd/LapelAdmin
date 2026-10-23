@@ -11,7 +11,7 @@ export interface WalletSettlement {
 
 export const settlementService = {
   getSettlements: async (device: string, params?: { page?: number; size?: number }) => {
-    const response = await axiosInstance.get(`/api/v1/${device}/settlements`, { params });
+    const response = await axiosInstance.get(`/api/v1/${device}/admin/settlements`, { params });
     return response.data;
   },
 };

@@ -24,7 +24,7 @@ export const walletService = {
   // Create a new wallet
   createWallet: async (device: string, userId: string, data: CreateWalletDTO): Promise<ApiResponse<WalletDTO>> => {
     const response = await axiosInstance.post(
-      `/api/v1/${device}/wallets`,
+      `/api/v1/${device}/admin/wallets`,
       data,
       getHeaders(userId)
     );
@@ -34,7 +34,7 @@ export const walletService = {
   // Get wallet by user ID
   getWallet: async (device: string, userId: string): Promise<ApiResponse<WalletDTO>> => {
     const response = await axiosInstance.get(
-      `/api/v1/${device}/wallets/wallet`,
+      `/api/v1/${device}/admin/wallets/wallet`,
       getHeaders(userId)
     );
     return response.data;
@@ -43,7 +43,7 @@ export const walletService = {
   // Get wallet balance
   getBalance: async (device: string, userId: string): Promise<ApiResponse<number>> => {
     const response = await axiosInstance.get(
-      `/api/v1/${device}/wallets/balance`,
+      `/api/v1/${device}/admin/wallets/balance`,
       getHeaders(userId)
     );
     return response.data;
@@ -52,7 +52,7 @@ export const walletService = {
   // Get wallet summary
   getSummary: async (device: string, userId: string): Promise<ApiResponse<string>> => {
     const response = await axiosInstance.get(
-      `/api/v1/${device}/wallets/summary`,
+      `/api/v1/${device}/admin/wallets/summary`,
       getHeaders(userId)
     );
     return response.data;
@@ -61,7 +61,7 @@ export const walletService = {
   // Credit wallet (Super Admin/Management only)
   creditWallet: async (device: string, userId: string, amount: number): Promise<ApiResponse<WalletDTO>> => {
     const response = await axiosInstance.post(
-      `/api/v1/${device}/wallets/credit`,
+      `/api/v1/${device}/admin/wallets/credit`,
       null,
       {
         params: { amount },
@@ -74,7 +74,7 @@ export const walletService = {
   // Debit wallet (Super Admin/Management only)
   debitWallet: async (device: string, userId: string, amount: number): Promise<ApiResponse<WalletDTO>> => {
     const response = await axiosInstance.post(
-      `/api/v1/${device}/wallets/debit`,
+      `/api/v1/${device}/admin/wallets/debit`,
       null,
       {
         params: { amount },
@@ -86,7 +86,7 @@ export const walletService = {
 
   // Get all wallets with pagination and search
   getAllWallets: async (device: string, params: WalletSearchParams): Promise<ApiResponse<PaginatedResponse<WalletDTO>>> => {
-    const response = await axiosInstance.get(`/api/v1/${device}/wallets`, {
+    const response = await axiosInstance.get(`/api/v1/${device}/admin/wallets`, {
       params,
       ...getHeaders()
     });
@@ -96,7 +96,7 @@ export const walletService = {
   // Activate wallet
   activateWallet: async (device: string, walletId: string): Promise<ApiResponse<WalletDTO>> => {
     const response = await axiosInstance.patch(
-      `/api/v1/${device}/wallets/${walletId}/activate`
+      `/api/v1/${device}/admin/wallets/${walletId}/activate`
     );
     return response.data;
   },
@@ -104,7 +104,7 @@ export const walletService = {
   // Deactivate wallet
   deactivateWallet: async (device: string, walletId: string): Promise<ApiResponse<WalletDTO>> => {
     const response = await axiosInstance.patch(
-      `/api/v1/${device}/wallets/${walletId}/deactivate`
+      `/api/v1/${device}/admin/wallets/${walletId}/deactivate`
     );
     return response.data;
   },
@@ -112,7 +112,7 @@ export const walletService = {
   // Delete wallet
   deleteWallet: async (device: string, walletId: string): Promise<ApiResponse<void>> => {
     const response = await axiosInstance.delete(
-      `/api/v1/${device}/wallets/${walletId}`
+      `/api/v1/${device}/admin/wallets/${walletId}`
     );
     return response.data;
   },
@@ -120,14 +120,14 @@ export const walletService = {
   // Statistics
   getTotalWalletCount: async (device: string): Promise<ApiResponse<number>> => {
     const response = await axiosInstance.get(
-      `/api/v1/${device}/wallets/stats/count`
+      `/api/v1/${device}/admin/wallets/stats/count`
     );
     return response.data;
   },
 
   getActiveWalletCount: async (device: string): Promise<ApiResponse<number>> => {
     const response = await axiosInstance.get(
-      `/api/v1/${device}/wallets/stats/active-count`
+      `/api/v1/${device}/admin/wallets/stats/active-count`
     );
     return response.data;
   }

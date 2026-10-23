@@ -11,7 +11,7 @@ import {
 export const consoleService = {
 
   getCatalog: async (device: string): Promise<ApiResponse<ApiCatalogService[]>> => {
-    const response = await axiosInstance.get(`/api/v1/${device}/console/catalog`);
+    const response = await axiosInstance.get(`/api/v1/${device}/admin/console/catalog`);
     return response.data;
   },
 
@@ -19,7 +19,7 @@ export const consoleService = {
     device: string,
     request: ConsoleExecuteRequest
   ): Promise<ApiResponse<ConsoleExecuteResult>> => {
-    const response = await axiosInstance.post(`/api/v1/${device}/console/execute`, request);
+    const response = await axiosInstance.post(`/api/v1/${device}/admin/console/execute`, request);
     return response.data;
   },
 
@@ -28,7 +28,7 @@ export const consoleService = {
     page: number,
     size: number
   ): Promise<ApiResponse<PaginatedResponse<ApiLogEntry>>> => {
-    const response = await axiosInstance.get(`/api/v1/${device}/console/logs`, {
+    const response = await axiosInstance.get(`/api/v1/${device}/admin/console/logs`, {
       params: { page, size },
     });
     return response.data;

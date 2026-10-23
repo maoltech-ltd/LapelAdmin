@@ -7,6 +7,7 @@ import DetailDrawer from '@/component/utils/DetailDrawer';
 import { Rider } from '../../../lib/types/rider.types';
 import { riderService } from '../../../lib/api/services/riderService';
 import DocumentViewer from './DocumentViewer';
+import DriverStrikesSection from './DriverStrikesSection';
 import RatingSummary from './RatingSummary';
 import VerificationStatusBadge from './VerificationStatusBadge';
 
@@ -153,6 +154,8 @@ export default function DriverProfileDrawer({
         <DetailSection title="Performance">
           <RatingSummary rating={driver.rating} trips={20} />
         </DetailSection>
+
+        <DriverStrikesSection device={DEVICE} userId={driver.user?.id} />
 
         {driver.id && (
           <EntityStatsSection
